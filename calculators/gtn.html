@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#8b1e3f" />
+  <meta name="description" content="FIGO gestational trophoblastic neoplasia staging and WHO prognostic score calculator." />
+  <title>FIGO Gestational Trophoblastic Neoplasia Staging Calculator</title>
+  <style>
+    :root {
+      --figo: #8b1e3f;
+      --figo-dark: #65142d;
+      --ink: #1e2228;
+      --muted: #69707d;
+      --line: #dde2ea;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --soft: #f9eef3;
+      --shadow: 0 18px 45px rgba(21, 26, 39, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, #fff 0, #fff 22rem, var(--bg) 22rem), var(--bg);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 24px clamp(14px, 3vw, 32px) 42px;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--figo);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .subhead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 850px;
+      font-size: 1.02rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(221, 226, 234, .92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0;
+      padding: 18px 20px 8px;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+
+    form { padding: 4px 20px 20px; }
+
+    fieldset {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 0;
+      padding: 18px 0 4px;
+    }
+
+    fieldset:first-of-type { border-top: 0; padding-top: 6px; }
+
+    .section-title {
+      margin: 4px 0 12px;
+      color: var(--figo);
+      font-weight: 800;
+      font-style: italic;
+      font-size: .98rem;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: minmax(170px, .62fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      margin: 0 0 14px;
+    }
+
+    label {
+      font-weight: 780;
+      padding-top: 10px;
+      font-size: .94rem;
+    }
+
+    .hint {
+      display: block;
+      color: var(--muted);
+      font-weight: 520;
+      font-size: .78rem;
+      margin-top: 3px;
+    }
+
+    select {
+      width: 100%;
+      appearance: none;
+      border: 1px solid #cfd7e3;
+      border-radius: 13px;
+      padding: 12px 42px 12px 12px;
+      min-height: 46px;
+      font: inherit;
+      color: var(--ink);
+      background:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 18px) calc(50% - 3px) / 7px 7px no-repeat,
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%) calc(100% - 13px) calc(50% - 3px) / 7px 7px no-repeat,
+        #fff;
+    }
+
+    select:focus {
+      outline: 3px solid rgba(139, 30, 63, .16);
+      border-color: var(--figo);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 800;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .secondary {
+      color: var(--figo);
+      background: var(--soft);
+    }
+
+    .ghost {
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+    }
+
+    .result-card {
+      position: sticky;
+      top: 14px;
+    }
+
+    .result-main {
+      padding: 20px;
+      background: linear-gradient(145deg, #fff, #fff9fb);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stage-label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+
+    .stage {
+      margin: 0;
+      color: var(--figo);
+      font-size: clamp(2rem, 8vw, 3.6rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .stage.empty {
+      color: var(--muted);
+      font-size: clamp(1.55rem, 7vw, 2.3rem);
+      letter-spacing: -0.025em;
+    }
+
+    .reason {
+      margin: 12px 0 0;
+      color: var(--ink);
+      font-size: 1rem;
+    }
+
+    .support { padding: 16px 20px 20px; }
+    .support h3 { margin: 0 0 8px; font-size: .95rem; }
+    .support ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .support li { margin: 6px 0; }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 15px;
+      border: 1px solid #ecd79b;
+      background: #fff8e7;
+      color: #5f4307;
+      font-size: .88rem;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    footer p { margin: 6px 0; }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 14px;
+      color: var(--figo);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .home-link:hover { color: var(--figo-dark); }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all .22s ease;
+      background: #111827;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .88rem;
+      box-shadow: 0 16px 38px rgba(0,0,0,.24);
+      z-index: 50;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: 1fr; }
+      .result-card { position: static; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding-top: 18px; }
+      .field { grid-template-columns: 1fr; gap: 6px; }
+      label { padding-top: 0; }
+      .card h2, form, .result-main, .support { padding-left: 16px; padding-right: 16px; }
+      select { font-size: 16px; }
+      .actions button { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="home-link" href="../index.html">← Calculator menu</a>
+      <p class="eyebrow">FIGO Women's Cancer Committee</p>
+      <h1>FIGO Gestational Trophoblastic Neoplasia Staging Calculator</h1>
+      <p class="subhead">Select the anatomic disease extent and WHO prognostic factors. The output combines FIGO stage and score, for example Stage II:4.</p>
+    </header>
+
+    <main class="grid">
+      <section class="card" aria-labelledby="input-heading">
+        <h2 id="input-heading">Staging inputs</h2>
+        <form id="stageForm">
+          <fieldset>
+            <p class="section-title">FIGO anatomic stage</p>
+            <div class="field">
+              <label for="diseaseExtent">Disease extent
+                <span class="hint">Choose the most advanced disease site.</span>
+              </label>
+              <select id="diseaseExtent" name="diseaseExtent">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="uterus">Strictly confined to the uterine corpus</option>
+                <option value="genital">Extends to adnexa or vagina, limited to genital structures</option>
+                <option value="lung">Extends to lungs, with or without genital tract involvement</option>
+                <option value="other-metastatic">All other metastatic sites</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <p class="section-title">WHO prognostic score modified as FIGO score</p>
+            <div class="field">
+              <label for="age">Age</label>
+              <select id="age" name="age">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">&lt;40 years</option>
+                <option value="1">≥40 years</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="antecedentPregnancy">Antecedent pregnancy</label>
+              <select id="antecedentPregnancy" name="antecedentPregnancy">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">Mole</option>
+                <option value="1">Abortion</option>
+                <option value="2">Term pregnancy</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="interval">Interval from index pregnancy</label>
+              <select id="interval" name="interval">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">&lt;4 months</option>
+                <option value="1">4-6 months</option>
+                <option value="2">7-12 months</option>
+                <option value="4">&gt;12 months</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="hcg">Pre-treatment hCG
+                <span class="hint">mIU/mL.</span>
+              </label>
+              <select id="hcg" name="hcg">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">&lt;10³</option>
+                <option value="1">10³-10⁴</option>
+                <option value="2">&gt;10⁴-10⁵</option>
+                <option value="4">&gt;10⁵</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="tumorSize">Largest tumor size
+                <span class="hint">Including uterine tumor size.</span>
+              </label>
+              <select id="tumorSize" name="tumorSize">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">&lt;3 cm or no measurable extrauterine mass</option>
+                <option value="1">3-4 cm</option>
+                <option value="2">≥5 cm</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="metastasisSite">Site of metastases
+                <span class="hint">Use the highest-scoring site present.</span>
+              </label>
+              <select id="metastasisSite" name="metastasisSite">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">No metastasis / uterus only</option>
+                <option value="0">Lung</option>
+                <option value="1">Spleen or kidney</option>
+                <option value="2">Gastrointestinal tract</option>
+                <option value="4">Brain or liver</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="metastasisNumber">Number of metastases identified</label>
+              <select id="metastasisNumber" name="metastasisNumber">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">0 / none identified</option>
+                <option value="1">1-4</option>
+                <option value="2">5-8</option>
+                <option value="4">&gt;8</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="failedChemo">Previous failed chemotherapy</label>
+              <select id="failedChemo" name="failedChemo">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">None</option>
+                <option value="2">Single drug</option>
+                <option value="4">Two or more drugs</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="secondary" type="button" id="copyBtn">Copy result</button>
+            <button class="ghost" type="reset" id="resetBtn">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="card result-card" aria-live="polite" aria-labelledby="result-heading">
+        <div class="result-main">
+          <p class="stage-label" id="result-heading">FIGO stage and score</p>
+          <p class="stage empty" id="stageValue">Not determined</p>
+          <p class="reason" id="reasonText">Enter the available findings to calculate the stage and prognostic score.</p>
+          <div class="badge-row" id="badgeRow">
+            <span class="badge">GTN stage + score</span>
+          </div>
+        </div>
+        <div class="support">
+          <h3>Calculation rationale</h3>
+          <ul id="rationaleList">
+            <li>GTN classification combines an anatomic FIGO stage with the summed WHO prognostic score.</li>
+          </ul>
+          <div class="notice">
+            This calculator is a staging aid only. Confirm final GTN stage and score with complete clinical, imaging, histological, hCG, treatment, and multidisciplinary information before clinical use.
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <p><strong>Version:</strong> 1.0.0 · Standalone HTML calculator.</p>
+      <p><strong>Reference:</strong> Ngan HYS et al. Diagnosis and management of gestational trophoblastic disease: 2025 update. Int J Gynecol Obstet. 2025;171(Suppl. 1):78-85. DOI 10.1002/ijgo.70275.</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied</div>
+
+  <script>
+    const form = document.getElementById('stageForm');
+    const fields = ['diseaseExtent', 'age', 'antecedentPregnancy', 'interval', 'hcg', 'tumorSize', 'metastasisSite', 'metastasisNumber', 'failedChemo'];
+    const stageValue = document.getElementById('stageValue');
+    const reasonText = document.getElementById('reasonText');
+    const rationaleList = document.getElementById('rationaleList');
+    const badgeRow = document.getElementById('badgeRow');
+    const toast = document.getElementById('toast');
+
+    function getInputs() {
+      return Object.fromEntries(fields.map(id => [id, document.getElementById(id).value]));
+    }
+
+    function stageResult(stage, score, risk, reason, rationale, badges = []) {
+      return { stage, score, risk, reason, rationale: Array.isArray(rationale) ? rationale : [rationale], badges };
+    }
+
+    function anatomicStage(extent) {
+      if (extent === 'uterus') return { stage: 'I', reason: 'Disease is strictly confined to the uterine corpus.' };
+      if (extent === 'genital') return { stage: 'II', reason: 'Disease extends to adnexa or vagina but is limited to genital structures.' };
+      if (extent === 'lung') return { stage: 'III', reason: 'Disease extends to the lungs, with or without genital tract involvement.' };
+      if (extent === 'other-metastatic') return { stage: 'IV', reason: 'Metastatic disease involves other sites beyond lung/genital structures.' };
+      return { stage: '', reason: 'Anatomic disease extent is not selected.' };
+    }
+
+    function scoreInputs(v) {
+      const scoreFields = ['age', 'antecedentPregnancy', 'interval', 'hcg', 'tumorSize', 'metastasisSite', 'metastasisNumber', 'failedChemo'];
+      const missing = scoreFields.filter(id => v[id] === '');
+      const total = scoreFields.reduce((sum, id) => sum + (v[id] === '' ? 0 : Number(v[id])), 0);
+      return { total, missing };
+    }
+
+    function riskGroup(stage, score) {
+      if (!stage) return '';
+      if (stage === 'IV') return score >= 13 ? 'Ultra-high-risk GTN' : 'High-risk GTN';
+      if (score >= 13) return 'Ultra-high-risk GTN';
+      if (score >= 7) return 'High-risk GTN';
+      return 'Low-risk GTN';
+    }
+
+    function calculateStage(v) {
+      const anatomy = anatomicStage(v.diseaseExtent);
+      const score = scoreInputs(v);
+
+      if (!anatomy.stage && score.missing.length === fields.length - 1) {
+        return stageResult('', 0, '',
+          'Insufficient information to determine the FIGO stage and score.',
+          ['Select anatomic disease extent and the WHO prognostic score factors.'],
+          ['Needs input']);
+      }
+
+      const risk = riskGroup(anatomy.stage, score.total);
+      const output = anatomy.stage ? `Stage ${anatomy.stage}:${score.total}` : '';
+      const rationale = [];
+      const badges = [];
+
+      if (anatomy.stage) {
+        rationale.push(anatomy.reason);
+        badges.push(`Stage ${anatomy.stage}`);
+      } else {
+        rationale.push('Select disease extent to assign FIGO anatomic stage I, II, III, or IV.');
+      }
+
+      rationale.push(`WHO/FIGO prognostic score total: ${score.total}.`);
+      if (score.missing.length) {
+        rationale.push(`Score is incomplete: ${score.missing.length} score factor(s) not selected.`);
+        badges.push('Incomplete score');
+      }
+
+      if (risk) {
+        rationale.push(`Risk group: ${risk}. Low risk is score <7 for Stages I-III; high risk includes score ≥7 or Stage IV; score ≥13 is commonly considered ultra-high risk.`);
+        badges.push(risk);
+      }
+
+      if (anatomy.stage === 'IV') {
+        rationale.push('Stage IV GTN is treated as high-risk disease regardless of numeric score.');
+      }
+
+      return stageResult(output, score.total, risk,
+        output ? `${output} · ${risk || 'Risk group not determined'}` : 'Anatomic FIGO stage is not determined.',
+        rationale,
+        badges);
+    }
+
+    function renderResult(result) {
+      if (result.stage) {
+        stageValue.textContent = result.stage;
+        stageValue.classList.remove('empty');
+      } else {
+        stageValue.textContent = 'Not determined';
+        stageValue.classList.add('empty');
+      }
+      reasonText.textContent = result.reason;
+      rationaleList.innerHTML = result.rationale.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+      badgeRow.innerHTML = result.badges.map(item => `<span class="badge">${escapeHtml(item)}</span>`).join('');
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function update() {
+      const result = calculateStage(getInputs());
+      renderResult(result);
+      return result;
+    }
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    fields.forEach(id => document.getElementById(id).addEventListener('change', update));
+    form.addEventListener('reset', () => window.setTimeout(update, 0));
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const values = getInputs();
+      const result = update();
+      const lines = [
+        `FIGO GTN stage and score: ${result.stage || 'Not determined'}`,
+        `Risk group: ${result.risk || 'Not determined'}`,
+        `Reason: ${result.reason}`,
+        '',
+        'Inputs:',
+        `- Disease extent: ${values.diseaseExtent || 'Not selected'}`,
+        `- Age: ${values.age || 'Not selected'}`,
+        `- Antecedent pregnancy: ${values.antecedentPregnancy || 'Not selected'}`,
+        `- Interval from index pregnancy: ${values.interval || 'Not selected'}`,
+        `- Pre-treatment hCG: ${values.hcg || 'Not selected'}`,
+        `- Largest tumor size: ${values.tumorSize || 'Not selected'}`,
+        `- Site of metastases: ${values.metastasisSite || 'Not selected'}`,
+        `- Number of metastases: ${values.metastasisNumber || 'Not selected'}`,
+        `- Previous failed chemotherapy: ${values.failedChemo || 'Not selected'}`,
+        '',
+        'Generated by FIGO Gestational Trophoblastic Neoplasia Staging Calculator v1.0.0.'
+      ];
+      try {
+        await navigator.clipboard.writeText(lines.join('\n'));
+        showToast('Result copied');
+      } catch (err) {
+        showToast('Copy unavailable');
+      }
+    });
+
+    update();
+  </script>
+</body>
+</html>
