@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#8b1e3f" />
+  <meta name="description" content="Combined FIGO gynecologic cancer staging calculator app." />
+  <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
+  <title>FIGO Gynecologic Cancer Staging Calculators</title>
+  <style>
+    :root {
+      --figo: #8b1e3f;
+      --figo-dark: #65142d;
+      --ink: #1e2228;
+      --muted: #69707d;
+      --line: #dde2ea;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --soft: #f9eef3;
+      --shadow: 0 18px 45px rgba(21, 26, 39, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, #fff 0, #fff 22rem, var(--bg) 22rem), var(--bg);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(14px, 3vw, 32px) 42px;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--figo);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 5vw, 3.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .calculator-card {
+      display: flex;
+      min-height: 96px;
+      padding: 16px;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      color: inherit;
+      text-decoration: none;
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(221, 226, 234, .92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .calculator-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139, 30, 63, .34);
+      box-shadow: 0 22px 48px rgba(21, 26, 39, 0.12);
+    }
+
+    .calculator-card:focus {
+      outline: 3px solid rgba(139, 30, 63, .16);
+      border-color: var(--figo);
+    }
+
+    .card-label {
+      margin: 0 0 10px;
+      color: var(--figo);
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.18rem, 3vw, 1.55rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+
+    .open {
+      display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--figo);
+      background: var(--soft);
+      font-weight: 850;
+      font-size: .88rem;
+    }
+
+    .notice {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 15px;
+      border: 1px solid #ecd79b;
+      background: #fff8e7;
+      color: #5f4307;
+      font-size: .88rem;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    footer p { margin: 6px 0; }
+
+    @media (max-width: 760px) {
+      .calculator-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 420px) {
+      .calculator-card {
+        align-items: flex-start;
+      }
+
+      .open {
+        padding: 7px 10px;
+        font-size: .82rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">FIGO Women's Cancer Committee</p>
+      <h1>FIGO Gynecologic Cancer Staging Calculators</h1>
+    </header>
+
+    <main class="calculator-grid" aria-label="Calculator menu">
+      <a class="calculator-card" href="./calculators/ovarian-fallopian-peritoneal.html">
+        <div>
+          <p class="card-label">Ovary / Tube / Peritoneum</p>
+          <h2>Epithelial Ovarian, Fallopian Tube, and Peritoneal Cancer</h2>
+        </div>
+        <span class="open">Open Calculator</span>
+      </a>
+
+      <a class="calculator-card" href="./calculators/cervical.html">
+        <div>
+          <p class="card-label">Cervix</p>
+          <h2>Cervical Cancer</h2>
+        </div>
+        <span class="open">Open Calculator</span>
+      </a>
+
+      <a class="calculator-card" href="./calculators/vaginal.html">
+        <div>
+          <p class="card-label">Vagina</p>
+          <h2>Vaginal Cancer</h2>
+        </div>
+        <span class="open">Open Calculator</span>
+      </a>
+
+      <a class="calculator-card" href="./calculators/uterine-leiomyosarcoma.html">
+        <div>
+          <p class="card-label">Uterine Sarcoma</p>
+          <h2>Uterine Leiomyosarcoma</h2>
+        </div>
+        <span class="open">Open Calculator</span>
+      </a>
+
+      <a class="calculator-card" href="./calculators/gtn.html">
+        <div>
+          <p class="card-label">Trophoblastic Disease</p>
+          <h2>Gestational Trophoblastic Neoplasia</h2>
+        </div>
+        <span class="open">Open Calculator</span>
+      </a>
+    </main>
+
+    <div class="notice">
+      These calculators are staging aids only. Confirm final FIGO stage with complete clinical, imaging, operative, pathological, and multidisciplinary information before clinical use.
+    </div>
+
+    <footer>
+      <p><strong>Version:</strong> 1.0.0 · Online calculator suite.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
