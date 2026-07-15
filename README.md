@@ -2,6 +2,16 @@
 
 Online-only static website with calculators for:
 
+## Open the calculator
+
+[Open the FIGO staging calculators](https://tinchangchang.github.io/figo-staging-calculators/)
+
+Scan with a smartphone camera:
+
+![QR code for the FIGO staging calculators](FIGO-calculator-QR.png)
+
+## Included calculators
+
 - Epithelial ovarian, fallopian tube, and peritoneal cancer
 - Cervical cancer
 - Vaginal cancer
