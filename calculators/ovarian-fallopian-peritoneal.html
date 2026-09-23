@@ -373,7 +373,7 @@
               <label for="surgicalSpill">Surgical spill</label>
               <select id="surgicalSpill" name="surgicalSpill">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="no">No / not documented</option>
+                <option value="no">No surgical spill</option>
                 <option value="yes">Yes</option>
               </select>
             </div>
@@ -383,7 +383,7 @@
               </label>
               <select id="capsuleSurface" name="capsuleSurface">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="no">No / not documented</option>
+                <option value="no">Capsule intact and no surface tumor</option>
                 <option value="yes">Yes</option>
               </select>
             </div>
@@ -391,7 +391,7 @@
               <label for="washings">Ascites or peritoneal washings</label>
               <select id="washings" name="washings">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="no">No malignant cells / not documented</option>
+                <option value="no">No malignant cells</option>
                 <option value="yes">Malignant cells present</option>
               </select>
             </div>
@@ -428,10 +428,9 @@
               <select id="retroNodes" name="retroNodes">
                 <option value="" disabled selected hidden>Select...</option>
                 <option value="no">No positive retroperitoneal nodes selected</option>
-                <option value="positive-le-10mm">Positive nodes only, metastasis up to 10 mm</option>
-                <option value="positive-gt-10mm">Positive nodes only, metastasis more than 10 mm</option>
-                <option value="positive-size-unknown">Positive nodes only, size not specified</option>
-                <option value="positive-with-peritoneal">Positive nodes with peritoneal disease</option>
+                <option value="positive-le-10mm">Positive nodes, largest metastasis up to 10 mm</option>
+                <option value="positive-gt-10mm">Positive nodes, largest metastasis more than 10 mm</option>
+                <option value="positive-size-unknown">Positive nodes, metastasis size not specified</option>
               </select>
             </div>
           </fieldset>
@@ -483,7 +482,7 @@
     </main>
 
     <footer>
-      <p><strong>Version:</strong> 1.0.0 · Standalone HTML calculator.</p>
+      <p><strong>Version:</strong> 1.2.0 · Online calculator suite.</p>
       <p><strong>Reference:</strong> Renz M, Friedlander M, Berek JS. Cancer of the ovary, fallopian tube, and peritoneum: 2025 update. Int J Gynecol Obstet. 2025;171(Suppl. 1):6-35. DOI 10.1002/ijgo.70282.</p>
     </footer>
   </div>
@@ -516,7 +515,7 @@
         badges.push('Review primary site');
       }
 
-      if (v.retroNodes && v.retroNodes !== 'no' && v.retroNodes !== 'positive-with-peritoneal') {
+      if (v.retroNodes && v.retroNodes !== 'no') {
         notes.push('Retroperitoneal lymph-node involvement should be cytologically or histologically proven.');
       }
 
@@ -528,6 +527,14 @@
     }
 
     function calculateStage(v) {
+      const missing = fields.filter(id => !v[id]);
+      if (missing.length) {
+        return stageResult('',
+          `Complete ${missing.length} remaining staging ${missing.length === 1 ? 'field' : 'fields'} before assigning a final stage.`,
+          ['Unknown higher-stage findings are not treated as negative.'],
+          [`${fields.length - missing.length} of ${fields.length} complete`]);
+      }
+
       if (v.distantDisease === 'pleural-positive') {
         return addContext(v, stageResult('IVA',
           'Pleural effusion with positive cytology is present.',
@@ -590,7 +597,7 @@
           ['Retroperitoneal nodes', '> 10 mm']));
       }
 
-      if (v.retroNodes === 'positive-size-unknown' || v.retroNodes === 'positive-with-peritoneal') {
+      if (v.retroNodes === 'positive-size-unknown') {
         return addContext(v, stageResult('IIIA1',
           'Positive retroperitoneal lymph nodes are present without a selected extrapelvic peritoneal metastasis size.',
           ['Stage IIIA1 is assigned for positive retroperitoneal lymph nodes only; select node size to classify IIIA1(i) versus IIIA1(ii).'],
@@ -638,6 +645,14 @@
             'Tumor is limited to one or both ovaries/fallopian tubes with surgical spill.',
             ['Surgical spill corresponds to Stage IC1.'],
             ['Confined tumor', 'Surgical spill']));
+        }
+
+        const missingStageOneExclusions = ['surgicalSpill', 'capsuleSurface', 'washings'].filter(key => !v[key]);
+        if (missingStageOneExclusions.length) {
+          return addContext(v, stageResult('I',
+            'Tumor is confined to one or both ovaries/fallopian tubes, but the Stage I subcategory cannot be assigned until spill, capsule/surface, and cytology findings are documented.',
+            ['Stage IA or IB requires all relevant IC features to be explicitly absent; unknown findings are not treated as negative.'],
+            ['Stage I', 'Substage incomplete']));
         }
 
         if (v.confinedTumor === 'one') {
@@ -709,7 +724,7 @@
         `- Retroperitoneal lymph nodes: ${values.retroNodes || 'Not selected'}`,
         `- Distant metastasis: ${values.distantDisease || 'Not selected'}`,
         '',
-        'Generated by FIGO Ovarian, Fallopian Tube, and Peritoneal Cancer Staging Calculator v1.0.0.'
+        'Generated by FIGO Ovarian, Fallopian Tube, and Peritoneal Cancer Staging Calculator v1.2.0.'
       ];
       try {
         await navigator.clipboard.writeText(lines.join('\n'));

@@ -2,6 +2,10 @@
 
 Online-only static website with calculators for:
 
+Current release: **v1.2.0** (source-table and regression review completed 24 September 2026).
+
+See [VALIDATION-REPORT-v1.2.0.md](VALIDATION-REPORT-v1.2.0.md) for the source audit, corrections, automated verification, and remaining committee validation work.
+
 ## Open the calculator
 
 [Open the FIGO staging calculators](https://tinchangchang.github.io/figo-staging-calculators/)
@@ -15,8 +19,9 @@ Scan with a smartphone camera:
 - Epithelial ovarian, fallopian tube, and peritoneal cancer
 - Cervical cancer
 - Vaginal cancer
+- Endometrial cancer (FIGO 2023 anatomical and molecular staging)
 - Uterine leiomyosarcoma
-- Gestational trophoblastic neoplasia
+- Gestational trophoblastic neoplasia (FIGO 2026, including PSTT/ETT GP/PP classification)
 
 Open `index.html` to choose a calculator. GitHub Pages deploys the site automatically after changes are merged into `main`.
 
