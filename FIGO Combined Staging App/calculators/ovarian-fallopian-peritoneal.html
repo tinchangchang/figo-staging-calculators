@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#8b1e3f" />
+  <meta name="description" content="FIGO staging calculator for epithelial ovarian, fallopian tube, and peritoneal cancer based on the 2025 IJGO update." />
+  <title>FIGO Epithelial Ovarian, Fallopian Tube, and Peritoneal Cancer Staging Calculator</title>
+  <style>
+    :root {
+      --figo: #8b1e3f;
+      --figo-dark: #65142d;
+      --ink: #1e2228;
+      --muted: #69707d;
+      --line: #dde2ea;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --soft: #f9eef3;
+      --warn: #a16207;
+      --shadow: 0 18px 45px rgba(21, 26, 39, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, #fff 0, #fff 22rem, var(--bg) 22rem), var(--bg);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 24px clamp(14px, 3vw, 32px) 42px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--figo);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .subhead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 840px;
+      font-size: 1.02rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(221, 226, 234, .92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0;
+      padding: 18px 20px 8px;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-title {
+      margin: 4px 0 12px;
+      color: var(--figo);
+      font-weight: 800;
+      font-style: italic;
+      font-size: .98rem;
+    }
+
+    form { padding: 4px 20px 20px; }
+
+    fieldset {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 0;
+      padding: 18px 0 4px;
+    }
+
+    fieldset:first-of-type { border-top: 0; padding-top: 6px; }
+
+    .field {
+      display: grid;
+      grid-template-columns: minmax(155px, .62fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      margin: 0 0 14px;
+    }
+
+    label {
+      font-weight: 780;
+      padding-top: 10px;
+      font-size: .94rem;
+    }
+
+    .hint {
+      display: block;
+      color: var(--muted);
+      font-weight: 520;
+      font-size: .78rem;
+      margin-top: 3px;
+    }
+
+    select {
+      width: 100%;
+      appearance: none;
+      border: 1px solid #cfd7e3;
+      border-radius: 13px;
+      padding: 12px 42px 12px 12px;
+      min-height: 46px;
+      font: inherit;
+      color: var(--ink);
+      background:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 18px) calc(50% - 3px) / 7px 7px no-repeat,
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%) calc(100% - 13px) calc(50% - 3px) / 7px 7px no-repeat,
+        #fff;
+    }
+
+    select:focus {
+      outline: 3px solid rgba(139, 30, 63, .16);
+      border-color: var(--figo);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 800;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .secondary {
+      color: var(--figo);
+      background: var(--soft);
+    }
+
+    .ghost {
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+    }
+
+    .result-card {
+      position: sticky;
+      top: 14px;
+    }
+
+    .result-main {
+      padding: 20px;
+      background: linear-gradient(145deg, #fff, #fff9fb);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stage-label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+
+    .stage {
+      margin: 0;
+      color: var(--figo);
+      font-size: clamp(2.1rem, 9vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .stage.empty {
+      color: var(--muted);
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+      letter-spacing: -0.025em;
+    }
+
+    .reason {
+      margin: 12px 0 0;
+      color: var(--ink);
+      font-size: 1rem;
+    }
+
+    .support {
+      padding: 16px 20px 20px;
+    }
+
+    .support h3 {
+      margin: 0 0 8px;
+      font-size: .95rem;
+    }
+
+    .support ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .support li { margin: 6px 0; }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 15px;
+      border: 1px solid #ecd79b;
+      background: #fff8e7;
+      color: #5f4307;
+      font-size: .88rem;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    footer p { margin: 6px 0; }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 14px;
+      color: var(--figo);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .home-link:hover { color: var(--figo-dark); }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all .22s ease;
+      background: #111827;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .88rem;
+      box-shadow: 0 16px 38px rgba(0,0,0,.24);
+      z-index: 50;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: 1fr; }
+      .result-card { position: static; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding-top: 18px; }
+      .field { grid-template-columns: 1fr; gap: 6px; }
+      label { padding-top: 0; }
+      .card h2, form, .result-main, .support { padding-left: 16px; padding-right: 16px; }
+      select { font-size: 16px; }
+      .actions button { flex: 1 1 100%; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: 100%; padding: 0; }
+      .grid { grid-template-columns: 1fr; }
+      .card { box-shadow: none; border-color: #aaa; }
+      .actions, .toast { display: none; }
+      .result-card { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="home-link" href="../index.html">← Calculator menu</a>
+      <p class="eyebrow">FIGO Women's Cancer Committee</p>
+      <h1>FIGO Epithelial Ovarian, Fallopian Tube, and Peritoneal Cancer Staging Calculator</h1>
+      <p class="subhead">Select the highest confirmed disease findings for epithelial ovarian, fallopian tube, or peritoneal cancer.</p>
+    </header>
+
+    <main class="grid">
+      <section class="card" aria-labelledby="input-heading">
+        <h2 id="input-heading">Staging inputs</h2>
+        <form id="stageForm">
+          <fieldset>
+            <p class="section-title">Primary tumor</p>
+            <div class="field">
+              <label for="primarySite">Primary site
+                <span class="hint">Designate when possible; use undesignated if not clear.</span>
+              </label>
+              <select id="primarySite" name="primarySite">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="ovary">Ovary</option>
+                <option value="fallopian tube">Fallopian tube</option>
+                <option value="peritoneum">Peritoneum</option>
+                <option value="undesignated">Undesignated / not clear</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="confinedTumor">Tumor confined to ovary/fallopian tube
+                <span class="hint">Use only when no pelvic, extrapelvic, nodal, or distant disease is selected.</span>
+              </label>
+              <select id="confinedTumor" name="confinedTumor">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="none">Not selected / not confined</option>
+                <option value="one">Limited to one ovary or one fallopian tube</option>
+                <option value="both">Limited to both ovaries or both fallopian tubes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="surgicalSpill">Surgical spill</label>
+              <select id="surgicalSpill" name="surgicalSpill">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No / not documented</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="capsuleSurface">Capsule or surface finding
+                <span class="hint">Capsule ruptured before surgery or tumor on ovarian/fallopian tube surface.</span>
+              </label>
+              <select id="capsuleSurface" name="capsuleSurface">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No / not documented</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="washings">Ascites or peritoneal washings</label>
+              <select id="washings" name="washings">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No malignant cells / not documented</option>
+                <option value="yes">Malignant cells present</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <p class="section-title">Pelvic and extrapelvic spread</p>
+            <div class="field">
+              <label for="pelvicExtension">Pelvic extension below pelvic brim</label>
+              <select id="pelvicExtension" name="pelvicExtension">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="none">No pelvic extension selected</option>
+                <option value="uterus-tube-ovary">Extension and/or implants on uterus, fallopian tubes, and/or ovaries</option>
+                <option value="other-pelvic">Extension to other pelvic intraperitoneal tissues</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="extrapelvicPeritoneum">Peritoneal spread outside pelvis
+                <span class="hint">Above pelvic brim; liver/spleen capsule is not parenchymal metastasis.</span>
+              </label>
+              <select id="extrapelvicPeritoneum" name="extrapelvicPeritoneum">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="none">No extrapelvic peritoneal involvement selected</option>
+                <option value="microscopic">Microscopic extrapelvic peritoneal involvement</option>
+                <option value="macro-le-2cm">Macroscopic peritoneal metastasis beyond pelvis, up to 2 cm</option>
+                <option value="macro-gt-2cm">Macroscopic peritoneal metastasis beyond pelvis, more than 2 cm</option>
+                <option value="liver-spleen-capsule">Tumor extends to liver/spleen capsule without parenchymal involvement</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="retroNodes">Retroperitoneal lymph nodes
+                <span class="hint">Positive nodes should be cytologically or histologically proven.</span>
+              </label>
+              <select id="retroNodes" name="retroNodes">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No positive retroperitoneal nodes selected</option>
+                <option value="positive-le-10mm">Positive nodes only, metastasis up to 10 mm</option>
+                <option value="positive-gt-10mm">Positive nodes only, metastasis more than 10 mm</option>
+                <option value="positive-size-unknown">Positive nodes only, size not specified</option>
+                <option value="positive-with-peritoneal">Positive nodes with peritoneal disease</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <p class="section-title">Distant disease</p>
+            <div class="field">
+              <label for="distantDisease">Distant metastasis
+                <span class="hint">Exclude peritoneal metastases when assigning Stage IV.</span>
+              </label>
+              <select id="distantDisease" name="distantDisease">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="none">No distant metastasis selected</option>
+                <option value="pleural-positive">Pleural effusion with positive cytology</option>
+                <option value="parenchymal-liver-spleen">Parenchymal liver or splenic metastasis</option>
+                <option value="extra-abdominal-organs">Metastasis to extra-abdominal organ(s)</option>
+                <option value="inguinal-or-extra-abdominal-nodes">Inguinal lymph nodes or lymph nodes outside abdominal cavity</option>
+                <option value="other-distant">Other distant metastasis</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="secondary" type="button" id="copyBtn">Copy result</button>
+            <button class="ghost" type="reset" id="resetBtn">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="card result-card" aria-live="polite" aria-labelledby="result-heading">
+        <div class="result-main">
+          <p class="stage-label" id="result-heading">FIGO 2014 stage</p>
+          <p class="stage empty" id="stageValue">Not determined</p>
+          <p class="reason" id="reasonText">Enter the available findings to calculate the stage.</p>
+          <div class="badge-row" id="badgeRow">
+            <span class="badge">Based on FIGO table</span>
+          </div>
+        </div>
+        <div class="support">
+          <h3>Calculation rationale</h3>
+          <ul id="rationaleList">
+            <li>Distant metastasis, extrapelvic peritoneal disease, and retroperitoneal nodal disease take priority over lower-stage pelvic or confined findings.</li>
+          </ul>
+          <div class="notice">
+            This calculator is a staging aid only. Confirm final FIGO 2014 stage with complete operative, imaging, pathological, cytological, and multidisciplinary information before clinical use.
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <p><strong>Version:</strong> 1.0.0 · Standalone HTML calculator.</p>
+      <p><strong>Reference:</strong> Renz M, Friedlander M, Berek JS. Cancer of the ovary, fallopian tube, and peritoneum: 2025 update. Int J Gynecol Obstet. 2025;171(Suppl. 1):6-35. DOI 10.1002/ijgo.70282.</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied</div>
+
+  <script>
+    const form = document.getElementById('stageForm');
+    const fields = ['primarySite', 'confinedTumor', 'surgicalSpill', 'capsuleSurface', 'washings', 'pelvicExtension', 'extrapelvicPeritoneum', 'retroNodes', 'distantDisease'];
+    const stageValue = document.getElementById('stageValue');
+    const reasonText = document.getElementById('reasonText');
+    const rationaleList = document.getElementById('rationaleList');
+    const badgeRow = document.getElementById('badgeRow');
+    const toast = document.getElementById('toast');
+
+    function getInputs() {
+      return Object.fromEntries(fields.map(id => [id, document.getElementById(id).value]));
+    }
+
+    function stageResult(stage, reason, rationale, badges = []) {
+      return { stage, reason, rationale: Array.isArray(rationale) ? rationale : [rationale], badges };
+    }
+
+    function addContext(v, result) {
+      const notes = [...result.rationale];
+      const badges = [...result.badges];
+
+      if (v.primarySite === 'peritoneum' && result.stage && result.stage.startsWith('I')) {
+        notes.push('Peritoneal cancer cannot be assigned Stage I; review primary site and disease distribution.');
+        badges.push('Review primary site');
+      }
+
+      if (v.retroNodes && v.retroNodes !== 'no' && v.retroNodes !== 'positive-with-peritoneal') {
+        notes.push('Retroperitoneal lymph-node involvement should be cytologically or histologically proven.');
+      }
+
+      if (v.extrapelvicPeritoneum === 'liver-spleen-capsule') {
+        notes.push('Liver/spleen capsule involvement without parenchymal disease is Stage IIIC, not Stage IVB.');
+      }
+
+      return { ...result, rationale: notes, badges };
+    }
+
+    function calculateStage(v) {
+      if (v.distantDisease === 'pleural-positive') {
+        return addContext(v, stageResult('IVA',
+          'Pleural effusion with positive cytology is present.',
+          ['FIGO Stage IVA is defined by pleural effusion with positive cytology.'],
+          ['Positive pleural cytology']));
+      }
+
+      if (['parenchymal-liver-spleen', 'extra-abdominal-organs', 'inguinal-or-extra-abdominal-nodes', 'other-distant'].includes(v.distantDisease)) {
+        const reasonMap = {
+          'parenchymal-liver-spleen': 'Parenchymal liver or splenic metastasis is present.',
+          'extra-abdominal-organs': 'Metastasis to extra-abdominal organ(s) is present.',
+          'inguinal-or-extra-abdominal-nodes': 'Inguinal or extra-abdominal lymph-node metastasis is present.',
+          'other-distant': 'Distant metastasis is present.'
+        };
+        return addContext(v, stageResult('IVB',
+          reasonMap[v.distantDisease],
+          ['FIGO Stage IVB includes parenchymal metastases and metastases to extra-abdominal organs, inguinal nodes, or lymph nodes outside the abdominal cavity.'],
+          ['Distant metastasis']));
+      }
+
+      if (v.extrapelvicPeritoneum === 'macro-gt-2cm') {
+        return addContext(v, stageResult('IIIC',
+          'Macroscopic peritoneal metastasis beyond the pelvis is more than 2 cm.',
+          ['Macroscopic extrapelvic peritoneal metastasis more than 2 cm corresponds to Stage IIIC, with or without retroperitoneal lymph-node metastasis.'],
+          ['Extrapelvic peritoneum', '> 2 cm']));
+      }
+
+      if (v.extrapelvicPeritoneum === 'liver-spleen-capsule') {
+        return addContext(v, stageResult('IIIC',
+          'Tumor extends to the capsule of the liver or spleen without parenchymal involvement.',
+          ['FIGO includes liver/spleen capsule extension without parenchymal involvement in Stage IIIC.'],
+          ['Capsule involvement']));
+      }
+
+      if (v.extrapelvicPeritoneum === 'macro-le-2cm') {
+        return addContext(v, stageResult('IIIB',
+          'Macroscopic peritoneal metastasis beyond the pelvis is up to 2 cm.',
+          ['Macroscopic extrapelvic peritoneal metastasis up to 2 cm corresponds to Stage IIIB, with or without retroperitoneal lymph-node metastasis.'],
+          ['Extrapelvic peritoneum', '≤ 2 cm']));
+      }
+
+      if (v.extrapelvicPeritoneum === 'microscopic') {
+        return addContext(v, stageResult('IIIA2',
+          'Microscopic extrapelvic peritoneal involvement is present.',
+          ['Microscopic peritoneal involvement above the pelvic brim corresponds to Stage IIIA2, with or without positive retroperitoneal lymph nodes.'],
+          ['Microscopic extrapelvic peritoneum']));
+      }
+
+      if (v.retroNodes === 'positive-le-10mm') {
+        return addContext(v, stageResult('IIIA1(i)',
+          'Positive retroperitoneal lymph nodes only, with metastasis up to 10 mm.',
+          ['Retroperitoneal lymph-node metastasis only, up to 10 mm in greatest dimension, corresponds to Stage IIIA1(i).'],
+          ['Retroperitoneal nodes', '≤ 10 mm']));
+      }
+
+      if (v.retroNodes === 'positive-gt-10mm') {
+        return addContext(v, stageResult('IIIA1(ii)',
+          'Positive retroperitoneal lymph nodes only, with metastasis more than 10 mm.',
+          ['Retroperitoneal lymph-node metastasis only, more than 10 mm in greatest dimension, corresponds to Stage IIIA1(ii).'],
+          ['Retroperitoneal nodes', '> 10 mm']));
+      }
+
+      if (v.retroNodes === 'positive-size-unknown' || v.retroNodes === 'positive-with-peritoneal') {
+        return addContext(v, stageResult('IIIA1',
+          'Positive retroperitoneal lymph nodes are present without a selected extrapelvic peritoneal metastasis size.',
+          ['Stage IIIA1 is assigned for positive retroperitoneal lymph nodes only; select node size to classify IIIA1(i) versus IIIA1(ii).'],
+          ['Retroperitoneal nodes', 'Size not selected']));
+      }
+
+      if (v.pelvicExtension === 'other-pelvic') {
+        return addContext(v, stageResult('IIB',
+          'Tumor extends to other pelvic intraperitoneal tissues below the pelvic brim.',
+          ['Extension to other pelvic intraperitoneal tissues corresponds to Stage IIB when no higher-stage feature is selected.'],
+          ['Pelvic extension']));
+      }
+
+      if (v.pelvicExtension === 'uterus-tube-ovary') {
+        return addContext(v, stageResult('IIA',
+          'Extension and/or implants involve uterus, fallopian tubes, and/or ovaries.',
+          ['Extension and/or implants on uterus, fallopian tubes, and/or ovaries corresponds to Stage IIA when no higher-stage feature is selected.'],
+          ['Pelvic extension']));
+      }
+
+      if (v.primarySite === 'peritoneum') {
+        return addContext(v, stageResult('II',
+          'Primary peritoneal cancer is selected without a higher-stage finding.',
+          ['The FIGO text states that Stage I peritoneal cancer is not possible; peritoneal cancer is included under Stage II unless higher-stage findings are selected.'],
+          ['Peritoneal primary']));
+      }
+
+      if (v.confinedTumor === 'one' || v.confinedTumor === 'both') {
+        if (v.washings === 'yes') {
+          return addContext(v, stageResult('IC3',
+            'Tumor is limited to one or both ovaries/fallopian tubes with malignant cells in ascites or peritoneal washings.',
+            ['Malignant cells in ascites or peritoneal washings correspond to Stage IC3.'],
+            ['Confined tumor', 'Malignant washings']));
+        }
+
+        if (v.capsuleSurface === 'yes') {
+          return addContext(v, stageResult('IC2',
+            'Tumor is limited to one or both ovaries/fallopian tubes with preoperative capsule rupture or surface tumor.',
+            ['Capsule ruptured before surgery or tumor on ovarian/fallopian tube surface corresponds to Stage IC2.'],
+            ['Confined tumor', 'Capsule/surface']));
+        }
+
+        if (v.surgicalSpill === 'yes') {
+          return addContext(v, stageResult('IC1',
+            'Tumor is limited to one or both ovaries/fallopian tubes with surgical spill.',
+            ['Surgical spill corresponds to Stage IC1.'],
+            ['Confined tumor', 'Surgical spill']));
+        }
+
+        if (v.confinedTumor === 'one') {
+          return addContext(v, stageResult('IA',
+            'Tumor is limited to one ovary or fallopian tube with capsule intact, no surface tumor, and no malignant cells in ascites/washings selected.',
+            ['Tumor limited to one ovary or fallopian tube corresponds to Stage IA when IC features and higher-stage spread are absent.'],
+            ['Confined to one site']));
+        }
+
+        return addContext(v, stageResult('IB',
+          'Tumor is limited to both ovaries or both fallopian tubes with capsules intact, no surface tumor, and no malignant cells in ascites/washings selected.',
+          ['Tumor limited to both ovaries or both fallopian tubes corresponds to Stage IB when IC features and higher-stage spread are absent.'],
+          ['Confined to both sites']));
+      }
+
+      return stageResult('',
+        'Insufficient information to determine the FIGO 2014 stage.',
+        ['Select at least one decisive finding, such as confined ovarian/fallopian disease, pelvic extension, extrapelvic peritoneal involvement, retroperitoneal nodes, or distant metastasis.'],
+        ['Needs input']);
+    }
+
+    function renderResult(result) {
+      if (result.stage) {
+        stageValue.textContent = result.stage;
+        stageValue.classList.remove('empty');
+      } else {
+        stageValue.textContent = 'Not determined';
+        stageValue.classList.add('empty');
+      }
+      reasonText.textContent = result.reason;
+      rationaleList.innerHTML = result.rationale.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+      badgeRow.innerHTML = result.badges.map(item => `<span class="badge">${escapeHtml(item)}</span>`).join('');
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function update() {
+      const result = calculateStage(getInputs());
+      renderResult(result);
+      return result;
+    }
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    fields.forEach(id => document.getElementById(id).addEventListener('change', update));
+    form.addEventListener('reset', () => window.setTimeout(update, 0));
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const values = getInputs();
+      const result = update();
+      const lines = [
+        `FIGO 2014 stage: ${result.stage || 'Not determined'}`,
+        `Reason: ${result.reason}`,
+        '',
+        'Inputs:',
+        `- Primary site: ${values.primarySite || 'Not selected'}`,
+        `- Tumor confined to ovary/fallopian tube: ${values.confinedTumor || 'Not selected'}`,
+        `- Surgical spill: ${values.surgicalSpill || 'Not selected'}`,
+        `- Capsule or surface finding: ${values.capsuleSurface || 'Not selected'}`,
+        `- Ascites or peritoneal washings: ${values.washings || 'Not selected'}`,
+        `- Pelvic extension below pelvic brim: ${values.pelvicExtension || 'Not selected'}`,
+        `- Peritoneal spread outside pelvis: ${values.extrapelvicPeritoneum || 'Not selected'}`,
+        `- Retroperitoneal lymph nodes: ${values.retroNodes || 'Not selected'}`,
+        `- Distant metastasis: ${values.distantDisease || 'Not selected'}`,
+        '',
+        'Generated by FIGO Ovarian, Fallopian Tube, and Peritoneal Cancer Staging Calculator v1.0.0.'
+      ];
+      try {
+        await navigator.clipboard.writeText(lines.join('\n'));
+        showToast('Result copied');
+      } catch (err) {
+        showToast('Copy unavailable');
+      }
+    });
+
+    update();
+  </script>
+</body>
+</html>

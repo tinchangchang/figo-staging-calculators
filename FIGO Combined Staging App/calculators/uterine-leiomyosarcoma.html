@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#8b1e3f" />
+  <meta name="description" content="FIGO uterine leiomyosarcoma surgical staging calculator based on selectable disease findings." />
+  <title>FIGO Uterine Leiomyosarcoma Staging Calculator</title>
+  <style>
+    :root {
+      --figo: #8b1e3f;
+      --figo-dark: #65142d;
+      --ink: #1e2228;
+      --muted: #69707d;
+      --line: #dde2ea;
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --soft: #f9eef3;
+      --shadow: 0 18px 45px rgba(21, 26, 39, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, #fff 0, #fff 22rem, var(--bg) 22rem), var(--bg);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 24px clamp(14px, 3vw, 32px) 42px;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--figo);
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .subhead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 820px;
+      font-size: 1.02rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(221, 226, 234, .92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0;
+      padding: 18px 20px 8px;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+
+    form { padding: 4px 20px 20px; }
+
+    fieldset {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 0;
+      padding: 18px 0 4px;
+    }
+
+    fieldset:first-of-type { border-top: 0; padding-top: 6px; }
+
+    .section-title {
+      margin: 4px 0 12px;
+      color: var(--figo);
+      font-weight: 800;
+      font-style: italic;
+      font-size: .98rem;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: minmax(155px, .62fr) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      margin: 0 0 14px;
+    }
+
+    label {
+      font-weight: 780;
+      padding-top: 10px;
+      font-size: .94rem;
+    }
+
+    .hint {
+      display: block;
+      color: var(--muted);
+      font-weight: 520;
+      font-size: .78rem;
+      margin-top: 3px;
+    }
+
+    select {
+      width: 100%;
+      appearance: none;
+      border: 1px solid #cfd7e3;
+      border-radius: 13px;
+      padding: 12px 42px 12px 12px;
+      min-height: 46px;
+      font: inherit;
+      color: var(--ink);
+      background:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%) calc(100% - 18px) calc(50% - 3px) / 7px 7px no-repeat,
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%) calc(100% - 13px) calc(50% - 3px) / 7px 7px no-repeat,
+        #fff;
+    }
+
+    select:focus {
+      outline: 3px solid rgba(139, 30, 63, .16);
+      border-color: var(--figo);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 800;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .secondary {
+      color: var(--figo);
+      background: var(--soft);
+    }
+
+    .ghost {
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+    }
+
+    .result-card {
+      position: sticky;
+      top: 14px;
+    }
+
+    .result-main {
+      padding: 20px;
+      background: linear-gradient(145deg, #fff, #fff9fb);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stage-label {
+      color: var(--muted);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+
+    .stage {
+      margin: 0;
+      color: var(--figo);
+      font-size: clamp(2.1rem, 9vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .stage.empty {
+      color: var(--muted);
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+      letter-spacing: -0.025em;
+    }
+
+    .reason {
+      margin: 12px 0 0;
+      color: var(--ink);
+      font-size: 1rem;
+    }
+
+    .support { padding: 16px 20px 20px; }
+    .support h3 { margin: 0 0 8px; font-size: .95rem; }
+    .support ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .support li { margin: 6px 0; }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 15px;
+      border: 1px solid #ecd79b;
+      background: #fff8e7;
+      color: #5f4307;
+      font-size: .88rem;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    footer p { margin: 6px 0; }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 14px;
+      color: var(--figo);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .home-link:hover { color: var(--figo-dark); }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all .22s ease;
+      background: #111827;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .88rem;
+      box-shadow: 0 16px 38px rgba(0,0,0,.24);
+      z-index: 50;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: 1fr; }
+      .result-card { position: static; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding-top: 18px; }
+      .field { grid-template-columns: 1fr; gap: 6px; }
+      label { padding-top: 0; }
+      .card h2, form, .result-main, .support { padding-left: 16px; padding-right: 16px; }
+      select { font-size: 16px; }
+      .actions button { flex: 1 1 100%; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: 100%; padding: 0; }
+      .grid { grid-template-columns: 1fr; }
+      .card { box-shadow: none; border-color: #aaa; }
+      .actions, .toast { display: none; }
+      .result-card { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="home-link" href="../index.html">← Calculator menu</a>
+      <p class="eyebrow">FIGO Women's Cancer Committee</p>
+      <h1>FIGO Uterine Leiomyosarcoma Staging Calculator</h1>
+      <p class="subhead">Select the relevant surgical findings for uterine leiomyosarcoma.</p>
+    </header>
+
+    <main class="grid">
+      <section class="card" aria-labelledby="input-heading">
+        <h2 id="input-heading">Staging inputs</h2>
+        <form id="stageForm">
+          <fieldset>
+            <p class="section-title">Uterine-confined disease</p>
+            <div class="field">
+              <label for="uterineExtent">Disease limited to uterus
+                <span class="hint">Use when no extrauterine disease is selected.</span>
+              </label>
+              <select id="uterineExtent" name="uterineExtent">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="not-selected">Not selected / not limited to uterus</option>
+                <option value="le-5cm">Tumor limited to uterus, ≤5 cm in largest dimension</option>
+                <option value="gt-5cm">Tumor limited to uterus, >5 cm</option>
+                <option value="size-unknown">Tumor limited to uterus, size not specified</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <p class="section-title">Extrauterine spread</p>
+            <div class="field">
+              <label for="pelvicSpread">Beyond uterus but within pelvis</label>
+              <select id="pelvicSpread" name="pelvicSpread">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="none">No pelvic spread selected</option>
+                <option value="adnexa">Involving the adnexa</option>
+                <option value="other-pelvic">Involving other pelvic tissues</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="abdominalTissues">Abdominal tissue infiltration</label>
+              <select id="abdominalTissues" name="abdominalTissues">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="none">No abdominal tissue infiltration selected</option>
+                <option value="one-site">Infiltrating abdominal tissues in one site</option>
+                <option value="multiple-sites">Infiltrating abdominal tissues in >1 site</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="nodes">Pelvic and/or para-aortic lymph nodes</label>
+              <select id="nodes" name="nodes">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No nodal metastasis selected</option>
+                <option value="yes">Pelvic and/or para-aortic lymph-node metastasis</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <p class="section-title">Advanced disease</p>
+            <div class="field">
+              <label for="bladderRectum">Bladder or rectum invasion</label>
+              <select id="bladderRectum" name="bladderRectum">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No bladder/rectum invasion selected</option>
+                <option value="yes">Invading bladder or rectum</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="distantMetastases">Distant metastases</label>
+              <select id="distantMetastases" name="distantMetastases">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="no">No distant metastases selected</option>
+                <option value="yes">Distant metastases present</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="secondary" type="button" id="copyBtn">Copy result</button>
+            <button class="ghost" type="reset" id="resetBtn">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="card result-card" aria-live="polite" aria-labelledby="result-heading">
+        <div class="result-main">
+          <p class="stage-label" id="result-heading">FIGO surgical stage</p>
+          <p class="stage empty" id="stageValue">Not determined</p>
+          <p class="reason" id="reasonText">Enter the available findings to calculate the stage.</p>
+          <div class="badge-row" id="badgeRow">
+            <span class="badge">Uterine leiomyosarcoma</span>
+          </div>
+        </div>
+        <div class="support">
+          <h3>Calculation rationale</h3>
+          <ul id="rationaleList">
+            <li>Distant metastases, bladder/rectum invasion, nodal metastasis, and abdominal tissue infiltration take priority over lower uterine-confined or pelvic findings.</li>
+          </ul>
+          <div class="notice">
+            This calculator is a staging aid only. Confirm final FIGO surgical stage with complete operative, imaging, pathological, and multidisciplinary information before clinical use.
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <p><strong>Version:</strong> 1.0.0 · Standalone HTML calculator.</p>
+      <p><strong>Reference:</strong> Uploaded MSD Manual Professional Edition table: FIGO Surgical Staging of Uterine Sarcoma: Leiomyosarcoma and Endometrial Stromal Sarcoma. Adapted from FIGO/AJCC staging, AJCC Cancer Staging Manual, 8th edition, 2017.</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied</div>
+
+  <script>
+    const form = document.getElementById('stageForm');
+    const fields = ['uterineExtent', 'pelvicSpread', 'abdominalTissues', 'nodes', 'bladderRectum', 'distantMetastases'];
+    const stageValue = document.getElementById('stageValue');
+    const reasonText = document.getElementById('reasonText');
+    const rationaleList = document.getElementById('rationaleList');
+    const badgeRow = document.getElementById('badgeRow');
+    const toast = document.getElementById('toast');
+
+    function getInputs() {
+      return Object.fromEntries(fields.map(id => [id, document.getElementById(id).value]));
+    }
+
+    function stageResult(stage, reason, rationale, badges = []) {
+      return { stage, reason, rationale: Array.isArray(rationale) ? rationale : [rationale], badges };
+    }
+
+    function calculateStage(v) {
+      if (v.distantMetastases === 'yes') {
+        return stageResult('IVB',
+          'Distant metastases are present.',
+          ['Distant metastases correspond to FIGO Stage IVB.'],
+          ['Distant metastases']);
+      }
+
+      if (v.bladderRectum === 'yes') {
+        return stageResult('IVA',
+          'Tumor invades bladder or rectum.',
+          ['Bladder or rectum invasion corresponds to FIGO Stage IVA.'],
+          ['Bladder/rectum']);
+      }
+
+      if (v.nodes === 'yes') {
+        return stageResult('IIIC',
+          'Pelvic and/or para-aortic lymph-node metastasis is present.',
+          ['Pelvic and/or para-aortic lymph-node metastasis corresponds to FIGO Stage IIIC.'],
+          ['Nodal metastasis']);
+      }
+
+      if (v.abdominalTissues === 'multiple-sites') {
+        return stageResult('IIIB',
+          'Tumor infiltrates abdominal tissues in more than one site.',
+          ['Abdominal tissue infiltration in >1 site corresponds to FIGO Stage IIIB.'],
+          ['Abdominal tissues', '>1 site']);
+      }
+
+      if (v.abdominalTissues === 'one-site') {
+        return stageResult('IIIA',
+          'Tumor infiltrates abdominal tissues in one site.',
+          ['Abdominal tissue infiltration in one site corresponds to FIGO Stage IIIA.'],
+          ['Abdominal tissues', 'One site']);
+      }
+
+      if (v.pelvicSpread === 'other-pelvic') {
+        return stageResult('IIB',
+          'Tumor extends beyond the uterus but remains within the pelvis, involving other pelvic tissues.',
+          ['Involvement of other pelvic tissues corresponds to FIGO Stage IIB.'],
+          ['Other pelvic tissues']);
+      }
+
+      if (v.pelvicSpread === 'adnexa') {
+        return stageResult('IIA',
+          'Tumor extends beyond the uterus but remains within the pelvis, involving the adnexa.',
+          ['Adnexal involvement corresponds to FIGO Stage IIA.'],
+          ['Adnexa']);
+      }
+
+      if (v.uterineExtent === 'le-5cm') {
+        return stageResult('IA',
+          'Tumor is limited to the uterus and measures ≤5 cm in largest dimension.',
+          ['Uterine-confined tumor ≤5 cm corresponds to FIGO Stage IA.'],
+          ['Limited to uterus', '≤5 cm']);
+      }
+
+      if (v.uterineExtent === 'gt-5cm') {
+        return stageResult('IB',
+          'Tumor is limited to the uterus and measures >5 cm.',
+          ['Uterine-confined tumor >5 cm corresponds to FIGO Stage IB.'],
+          ['Limited to uterus', '>5 cm']);
+      }
+
+      if (v.uterineExtent === 'size-unknown') {
+        return stageResult('I',
+          'Tumor is limited to the uterus, but size is not specified.',
+          ['Disease limited to the uterus corresponds to FIGO Stage I; select size to classify IA versus IB.'],
+          ['Limited to uterus', 'Size not selected']);
+      }
+
+      return stageResult('',
+        'Insufficient information to determine the FIGO surgical stage.',
+        ['Select uterine-confined tumor size, pelvic spread, abdominal tissue infiltration, nodal metastasis, bladder/rectum invasion, or distant metastases.'],
+        ['Needs input']);
+    }
+
+    function renderResult(result) {
+      if (result.stage) {
+        stageValue.textContent = result.stage;
+        stageValue.classList.remove('empty');
+      } else {
+        stageValue.textContent = 'Not determined';
+        stageValue.classList.add('empty');
+      }
+      reasonText.textContent = result.reason;
+      rationaleList.innerHTML = result.rationale.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+      badgeRow.innerHTML = result.badges.map(item => `<span class="badge">${escapeHtml(item)}</span>`).join('');
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function update() {
+      const result = calculateStage(getInputs());
+      renderResult(result);
+      return result;
+    }
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    fields.forEach(id => document.getElementById(id).addEventListener('change', update));
+    form.addEventListener('reset', () => window.setTimeout(update, 0));
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const values = getInputs();
+      const result = update();
+      const lines = [
+        `FIGO surgical stage: ${result.stage || 'Not determined'}`,
+        `Reason: ${result.reason}`,
+        '',
+        'Inputs:',
+        `- Disease limited to uterus: ${values.uterineExtent || 'Not selected'}`,
+        `- Beyond uterus but within pelvis: ${values.pelvicSpread || 'Not selected'}`,
+        `- Abdominal tissue infiltration: ${values.abdominalTissues || 'Not selected'}`,
+        `- Pelvic and/or para-aortic lymph nodes: ${values.nodes || 'Not selected'}`,
+        `- Bladder or rectum invasion: ${values.bladderRectum || 'Not selected'}`,
+        `- Distant metastases: ${values.distantMetastases || 'Not selected'}`,
+        '',
+        'Generated by FIGO Uterine Leiomyosarcoma Staging Calculator v1.0.0.'
+      ];
+      try {
+        await navigator.clipboard.writeText(lines.join('\n'));
+        showToast('Result copied');
+      } catch (err) {
+        showToast('Copy unavailable');
+      }
+    });
+
+    update();
+  </script>
+</body>
+</html>
