@@ -264,6 +264,58 @@
   function calculate(values) {
     const missing = missingInputs(values);
     if (missing.length) {
+      const metastaticNode = value => ['micro', 'macro', 'unspecified'].includes(value);
+      const decisiveFinding = values.distantMetastasis === 'present'
+        || ['pelvic', 'beyond-pelvis'].includes(values.peritoneum)
+        || values.bladderMucosa === 'involved'
+        || values.bowelMucosa === 'involved'
+        || metastaticNode(values.pelvicNodes)
+        || metastaticNode(values.paraaorticNodes)
+        || values.vagina === 'involved'
+        || values.parametria === 'involved'
+        || values.uterineSerosa === 'involved'
+        || ['intramucosal', 'involved'].includes(values.fallopianTube)
+        || ['unilateral-contained', 'unilateral-breach', 'bilateral'].includes(values.ovary);
+      const uterinePatternReady = values.histology
+        && values.myometrialInvasion
+        && values.lvsi
+        && values.cervicalStroma;
+
+      if (decisiveFinding || uterinePatternReady) {
+        const partialValues = {
+          histology: values.histology || 'low-grade-eec',
+          myometrialInvasion: values.myometrialInvasion || 'none',
+          lvsi: values.lvsi || 'none',
+          cervicalStroma: values.cervicalStroma || 'none',
+          ovary: values.ovary || 'none',
+          fallopianTube: values.fallopianTube || 'none',
+          uterineSerosa: values.uterineSerosa || 'none',
+          vagina: values.vagina || 'none',
+          parametria: values.parametria || 'none',
+          peritoneum: values.peritoneum || 'none',
+          pelvicNodes: values.pelvicNodes || 'none',
+          paraaorticNodes: values.paraaorticNodes || 'none',
+          bladderMucosa: values.bladderMucosa || 'none',
+          bowelMucosa: values.bowelMucosa || 'none',
+          distantMetastasis: values.distantMetastasis || 'none',
+          pole: values.pole || 'unknown',
+          mmr: values.mmr || 'unknown',
+          p53: values.p53 || 'unknown'
+        };
+        const partial = addMolecularDesignation(calculateAnatomicStage(partialValues), partialValues);
+        if (partial.anatomicStage) {
+          return {
+            ...partial,
+            status: 'provisional',
+            displayStage: `Provisional ${partial.displayStage}`,
+            reason: `Provisional ${partial.anatomicStage}: ${partial.reason}`,
+            rationale: [...partial.rationale, `${missing.length} unanswered anatomical field(s) could change the final stage.`],
+            badges: [...partial.badges, 'Provisional'],
+            missing
+          };
+        }
+      }
+
       return {
         status: 'incomplete',
         anatomicStage: '',

@@ -2,9 +2,9 @@
 
 Online-only static website with calculators for:
 
-Current release: **v1.2.0** (source-table and regression review completed 24 September 2026).
+Current release: **v1.3.0** (vulvar calculator and provisional live-stage display added 25 September 2026).
 
-See [VALIDATION-REPORT-v1.2.0.md](VALIDATION-REPORT-v1.2.0.md) for the source audit, corrections, automated verification, and remaining committee validation work.
+See [VALIDATION-REPORT-v1.3.0.md](VALIDATION-REPORT-v1.3.0.md) for the current source audit and verification status.
 
 ## Open the calculator
 
@@ -18,6 +18,7 @@ Scan with a smartphone camera:
 
 - Epithelial ovarian, fallopian tube, and peritoneal cancer
 - Cervical cancer
+- Vulvar cancer (FIGO 2021 staging)
 - Vaginal cancer
 - Endometrial cancer (FIGO 2023 anatomical and molecular staging)
 - Uterine leiomyosarcoma

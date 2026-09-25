@@ -6,8 +6,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
   <meta name="referrer" content="no-referrer" />
   <meta name="theme-color" content="#8b1e3f" />
-  <meta name="description" content="FIGO vaginal cancer staging calculator based on selectable TNM findings." />
-  <title>FIGO Vaginal Cancer Staging Calculator</title>
+  <meta name="description" content="FIGO 2021 vulvar cancer staging calculator." />
+  <title>FIGO 2021 Vulvar Cancer Staging Calculator</title>
   <style>
     :root {
       --figo: #8b1e3f;
@@ -321,8 +321,8 @@
     <header>
       <a class="home-link" href="../index.html">← Calculator menu</a>
       <p class="eyebrow">FIGO Women's Cancer Committee</p>
-      <h1>FIGO Vaginal Cancer Staging Calculator</h1>
-      <p class="subhead">Select the relevant vaginal primary tumor, regional lymph-node, and distant-metastasis findings.</p>
+      <h1>FIGO 2021 Vulvar Cancer Staging Calculator</h1>
+      <p class="subhead">Select the primary tumor extent, tumor size and invasion, inguinofemoral nodal findings, and distant disease.</p>
     </header>
 
     <main class="grid">
@@ -330,31 +330,35 @@
         <h2 id="input-heading">Staging inputs</h2>
         <form id="stageForm">
           <fieldset>
-            <p class="section-title">Primary tumor</p>
+            <p class="section-title">Primary vulvar tumor</p>
             <div class="field">
-              <label for="primaryTumor">Primary tumor extent</label>
-              <select id="primaryTumor" name="primaryTumor">
+              <label for="tumorExtent">Tumor extent</label>
+              <select id="tumorExtent" name="tumorExtent">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="not-assessed">Primary tumor cannot be assessed</option>
-                <option value="none">No evidence of primary tumor</option>
-                <option value="vagina-le-2cm">Tumor confined to vagina, measuring ≤2.0 cm</option>
-                <option value="vagina-gt-2cm">Tumor confined to vagina, measuring >2.0 cm</option>
-                <option value="vagina-size-unknown">Tumor confined to vagina, size not specified</option>
-                <option value="paravaginal-le-2cm">Invades paravaginal tissues, not to pelvic sidewall, measuring ≤2.0 cm</option>
-                <option value="paravaginal-gt-2cm">Invades paravaginal tissues, not to pelvic sidewall, measuring >2.0 cm</option>
-                <option value="paravaginal-size-unknown">Invades paravaginal tissues, not to pelvic sidewall, size not specified</option>
-                <option value="sidewall-hydronephrosis">Extends to pelvic sidewall and/or causes hydronephrosis or nonfunctioning kidney</option>
-                <option value="bladder-rectum-true-pelvis">Invades bladder/rectal mucosa or extends beyond true pelvis</option>
+                <option value="confined">Confined to the vulva</option>
+                <option value="lower-adjacent">Extends to lower third of urethra, vagina, or anus</option>
+                <option value="upper-adjacent">Extends to upper two-thirds of urethra/vagina, bladder mucosa, or rectal mucosa</option>
+                <option value="fixed-bone">Disease fixed to pelvic bone</option>
               </select>
             </div>
             <div class="field">
-              <label for="bullousEdema">Bullous edema only
-                <span class="hint">Bullous edema alone is not sufficient evidence for T4.</span>
-              </label>
-              <select id="bullousEdema" name="bullousEdema">
+              <label for="tumorSize">Greatest tumor dimension</label>
+              <select id="tumorSize" name="tumorSize">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="no">No / not selected</option>
-                <option value="yes">Yes, bullous edema only</option>
+                <option value="le2">≤2 cm</option>
+                <option value="gt2">>2 cm</option>
+                <option value="unknown">Not available</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="stromalInvasion">Depth of stromal invasion
+                <span class="hint">Measure from the basement membrane of the deepest adjacent dysplastic tumor-free rete ridge to the deepest invasion.</span>
+              </label>
+              <select id="stromalInvasion" name="stromalInvasion">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="le1">≤1 mm</option>
+                <option value="gt1">>1 mm</option>
+                <option value="unknown">Not available</option>
               </select>
             </div>
           </fieldset>
@@ -362,21 +366,24 @@
           <fieldset>
             <p class="section-title">Nodal and distant disease</p>
             <div class="field">
-              <label for="regionalNodes">Regional lymph nodes</label>
+              <label for="regionalNodes">Inguinal/femoral regional nodes</label>
               <select id="regionalNodes" name="regionalNodes">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="not-assessed">Regional lymph nodes cannot be assessed</option>
-                <option value="no">No regional lymph-node metastasis</option>
-                <option value="isolated-tumor-cells">Isolated tumor cells ≤0.2 mm only</option>
-                <option value="positive">Pelvic or inguinal lymph-node metastasis</option>
+                <option value="no">No regional nodal metastasis</option>
+                <option value="le5">Non-fixed, non-ulcerated metastasis ≤5 mm</option>
+                <option value="gt5">Non-fixed, non-ulcerated metastasis >5 mm</option>
+                <option value="extracapsular">Regional nodal metastasis with extracapsular spread</option>
+                <option value="fixed-ulcerated">Fixed or ulcerated regional nodal metastasis</option>
+                <option value="not-assessed">Not assessed</option>
               </select>
             </div>
             <div class="field">
-              <label for="distantMetastasis">Distant metastasis</label>
-              <select id="distantMetastasis" name="distantMetastasis">
+              <label for="distantDisease">Pelvic nodes or distant metastasis</label>
+              <select id="distantDisease" name="distantDisease">
                 <option value="" disabled selected hidden>Select...</option>
-                <option value="no">No distant metastasis</option>
-                <option value="yes">Distant metastasis present</option>
+                <option value="none">None</option>
+                <option value="pelvic-nodes">Pelvic lymph-node metastasis</option>
+                <option value="distant">Other distant metastasis</option>
               </select>
             </div>
           </fieldset>
@@ -390,20 +397,20 @@
 
       <aside class="card result-card" aria-live="polite" aria-labelledby="result-heading">
         <div class="result-main">
-          <p class="stage-label" id="result-heading">FIGO stage</p>
+          <p class="stage-label" id="result-heading">FIGO 2021 stage</p>
           <p class="stage empty" id="stageValue">Not determined</p>
-          <p class="reason" id="reasonText">Enter the available findings to calculate the stage.</p>
+          <p class="reason" id="reasonText">Enter any available finding to see the current provisional stage.</p>
           <div class="badge-row" id="badgeRow">
-            <span class="badge">FIGO vaginal staging</span>
+            <span class="badge">FIGO vulva 2021</span>
           </div>
         </div>
         <div class="support">
           <h3>Calculation rationale</h3>
           <ul id="rationaleList">
-            <li>Distant metastasis and bladder/rectal/beyond-true-pelvis findings take priority over lower local tumor findings.</li>
+            <li>Distant disease, fixed/ulcerated nodes, extracapsular spread, and nodal deposit size take priority over lower local findings.</li>
           </ul>
           <div class="notice">
-            This calculator is a staging aid only. Confirm final FIGO stage with complete clinical, imaging, pathological, and multidisciplinary information before clinical use.
+            Applicable to most primary vulvar malignancies except melanoma. Confirm the final surgical stage with complete pathological and multidisciplinary information.
           </div>
         </div>
       </aside>
@@ -411,7 +418,7 @@
 
     <footer>
       <p><strong>Version:</strong> 1.3.0 · Online calculator suite.</p>
-      <p><strong>Reference:</strong> Adams TS, Cuello MA. Cancer of the vagina: 2025 update. Int J Gynecol Obstet. 2025;171(Suppl. 1). DOI 10.1002/ijgo.70325.</p>
+      <p><strong>Reference:</strong> Olawaiye AB, Cuello MA, Beriwal S, Rogers LJ. Cancer of the vulva: 2025 update. Int J Gynecol Obstet. 2025;171(Suppl. 1):36-47. DOI 10.1002/ijgo.70390.</p>
     </footer>
   </div>
 
@@ -419,7 +426,7 @@
 
   <script>
     const form = document.getElementById('stageForm');
-    const fields = ['primaryTumor', 'bullousEdema', 'regionalNodes', 'distantMetastasis'];
+    const fields = ['tumorExtent', 'tumorSize', 'stromalInvasion', 'regionalNodes', 'distantDisease'];
     const stageValue = document.getElementById('stageValue');
     const reasonText = document.getElementById('reasonText');
     const rationaleList = document.getElementById('rationaleList');
@@ -434,119 +441,48 @@
       return { stage, reason, rationale: Array.isArray(rationale) ? rationale : [rationale], badges };
     }
 
-    function calculateStageCore(v) {
-      if (v.distantMetastasis === 'yes') {
+    function calculateVulvarStageCore(v) {
+      if (v.distantDisease === 'pelvic-nodes' || v.distantDisease === 'distant') {
         return stageResult('IVB',
-          'Distant metastasis is present.',
-          ['M1 distant metastasis corresponds to FIGO Stage IVB.'],
-          ['M1', 'Distant metastasis']);
+          v.distantDisease === 'pelvic-nodes' ? 'Pelvic lymph-node metastasis is present.' : 'Distant metastasis is present.',
+          ['Pelvic nodal or other distant metastatic disease corresponds to FIGO Stage IVB.'],
+          ['Distant disease']);
       }
-
-      if (v.primaryTumor === 'bladder-rectum-true-pelvis') {
-        if (v.bullousEdema === 'yes') {
-          return stageResult('',
-            'Bullous edema alone is insufficient for T4/Stage IVA.',
-            ['Confirm bladder or rectal mucosal invasion, or extension beyond the true pelvis, before assigning Stage IVA.'],
-            ['Review T4 evidence']);
-        }
-        const rationale = ['Tumor invading bladder or rectal mucosa, or extending beyond the true pelvis, corresponds to FIGO Stage IVA.'];
+      if (v.tumorExtent === 'fixed-bone' || v.regionalNodes === 'fixed-ulcerated') {
         return stageResult('IVA',
-          'Tumor invades bladder/rectal mucosa or extends beyond the true pelvis.',
-          rationale,
-          ['T4']);
+          v.tumorExtent === 'fixed-bone' ? 'Disease is fixed to pelvic bone.' : 'A regional node is fixed or ulcerated.',
+          ['Disease fixed to pelvic bone, or fixed/ulcerated inguinofemoral nodes, corresponds to Stage IVA.'],
+          ['Locally advanced']);
       }
-
-      if (v.regionalNodes === 'positive') {
-        if (v.primaryTumor === 'none' || v.primaryTumor === 'not-assessed') {
-          return stageResult('',
-            'Regional nodal disease cannot be grouped as vaginal Stage III without a T1-T3 primary tumor.',
-            ['Confirm the vaginal primary and its local extent; the calculator will not infer T1-T3 from N1 alone.'],
-            ['Primary tumor review']);
+      if (v.regionalNodes === 'extracapsular') {
+        return stageResult('IIIC', 'Regional nodal metastasis has extracapsular spread.', ['Extracapsular regional nodal spread corresponds to Stage IIIC.'], ['Extracapsular spread']);
+      }
+      if (v.regionalNodes === 'gt5') {
+        return stageResult('IIIB', 'A non-fixed, non-ulcerated regional nodal metastasis is >5 mm.', ['Regional nodal metastasis >5 mm corresponds to Stage IIIB.'], ['Node >5 mm']);
+      }
+      if (v.tumorExtent === 'upper-adjacent' || v.regionalNodes === 'le5') {
+        return stageResult('IIIA',
+          v.tumorExtent === 'upper-adjacent' ? 'Tumor extends to an upper adjacent perineal structure or bladder/rectal mucosa.' : 'Regional nodal metastasis is ≤5 mm.',
+          ['Either specified upper adjacent-structure extension or regional nodal metastasis ≤5 mm corresponds to Stage IIIA.'],
+          ['Stage IIIA']);
+      }
+      if (v.tumorExtent === 'lower-adjacent') {
+        return stageResult('II', 'Tumor extends to a lower-third adjacent perineal structure.', ['With no higher-stage nodal or distant finding, lower-third urethral, vaginal, or anal extension corresponds to Stage II.'], ['Lower adjacent structure']);
+      }
+      if (v.tumorExtent === 'confined') {
+        if (v.tumorSize === 'le2' && v.stromalInvasion === 'le1') {
+          return stageResult('IA', 'Tumor is confined to the vulva, ≤2 cm, with stromal invasion ≤1 mm.', ['Both size and depth criteria for Stage IA are met.'], ['≤2 cm', '≤1 mm invasion']);
         }
-        return stageResult('III',
-          'Pelvic or inguinal regional lymph-node metastasis is present.',
-          ['N1 regional lymph-node metastasis corresponds to FIGO Stage III.'],
-          ['N1']);
+        if (v.tumorSize === 'gt2' || v.stromalInvasion === 'gt1') {
+          return stageResult('IB', 'Tumor is confined to the vulva and exceeds the Stage IA size or invasion limit.', ['Tumor size >2 cm or stromal invasion >1 mm corresponds to Stage IB.'], ['Confined to vulva']);
+        }
+        return stageResult('I', 'Tumor is confined to the vulva, but IA versus IB cannot yet be determined.', ['Enter both tumor size and stromal invasion to assign IA or IB.'], ['Stage I', 'Substage incomplete']);
       }
-
-      if (v.primaryTumor === 'sidewall-hydronephrosis') {
-        return stageResult('III',
-          'Tumor extends to the pelvic sidewall and/or causes hydronephrosis or a nonfunctioning kidney.',
-          ['T3 disease corresponds to FIGO Stage III.'],
-          ['T3']);
-      }
-
-      if (v.primaryTumor === 'paravaginal-le-2cm') {
-        return stageResult('II',
-          'Tumor invades paravaginal tissues but not the pelvic sidewall, measuring ≤2.0 cm.',
-          ['T2a disease corresponds to FIGO Stage II.'],
-          ['T2a', '≤2.0 cm']);
-      }
-
-      if (v.primaryTumor === 'paravaginal-gt-2cm') {
-        return stageResult('II',
-          'Tumor invades paravaginal tissues but not the pelvic sidewall, measuring >2.0 cm.',
-          ['T2b disease corresponds to FIGO Stage II.'],
-          ['T2b', '>2.0 cm']);
-      }
-
-      if (v.primaryTumor === 'paravaginal-size-unknown') {
-        return stageResult('II',
-          'Tumor invades paravaginal tissues but not the pelvic sidewall.',
-          ['T2 disease corresponds to FIGO Stage II; select size if T2a/T2b detail is needed.'],
-          ['T2']);
-      }
-
-      if (v.primaryTumor === 'vagina-le-2cm') {
-        return stageResult('I',
-          'Tumor is confined to the vagina and measures ≤2.0 cm.',
-          ['T1a disease corresponds to FIGO Stage I.'],
-          ['T1a', '≤2.0 cm']);
-      }
-
-      if (v.primaryTumor === 'vagina-gt-2cm') {
-        return stageResult('I',
-          'Tumor is confined to the vagina and measures >2.0 cm.',
-          ['T1b disease corresponds to FIGO Stage I.'],
-          ['T1b', '>2.0 cm']);
-      }
-
-      if (v.primaryTumor === 'vagina-size-unknown') {
-        return stageResult('I',
-          'Tumor is confined to the vagina.',
-          ['T1 disease corresponds to FIGO Stage I; select size if T1a/T1b detail is needed.'],
-          ['T1']);
-      }
-
-      if (v.primaryTumor === 'none') {
-        return stageResult('',
-          'No evidence of primary tumor is selected.',
-          ['T0 is not assigned a FIGO stage in the uploaded staging table.'],
-          ['T0']);
-      }
-
-      if (v.primaryTumor === 'not-assessed' || v.regionalNodes === 'not-assessed') {
-        return stageResult('',
-          'The selected finding cannot be assessed.',
-          ['TX/NX findings are not sufficient to assign a FIGO stage.'],
-          ['Cannot assess']);
-      }
-
-      if (v.regionalNodes === 'isolated-tumor-cells') {
-        return stageResult('',
-          'Only isolated tumor cells in regional lymph node(s) are selected.',
-          ['N0(i+) is not staged as N1 in the uploaded table; select primary tumor extent to assign the FIGO stage.'],
-          ['N0(i+)']);
-      }
-
-      return stageResult('',
-        'Insufficient information to determine the FIGO stage.',
-        ['Select primary tumor extent, regional lymph-node metastasis, or distant metastasis.'],
-        ['Needs input']);
+      return stageResult('', 'Insufficient information to determine a stage.', ['Select any confirmed tumor, nodal, or distant-disease finding.'], ['Needs input']);
     }
 
     function calculateStage(v) {
-      const result = calculateStageCore(v);
+      const result = calculateVulvarStageCore(v);
       const missing = fields.filter(id => !v[id] || v[id] === 'not-assessed');
       if (!result.stage || !missing.length) return result;
       return {
@@ -594,16 +530,17 @@
       const values = getInputs();
       const result = update();
       const lines = [
-        `FIGO stage: ${result.stage ? `${result.provisional ? 'Provisional ' : ''}${result.stage}` : 'Not determined'}`,
+        `FIGO 2021 vulvar stage: ${result.stage ? `${result.provisional ? 'Provisional ' : ''}${result.stage}` : 'Not determined'}`,
         `Reason: ${result.reason}`,
         '',
         'Inputs:',
-        `- Primary tumor extent: ${values.primaryTumor || 'Not selected'}`,
-        `- Bullous edema only: ${values.bullousEdema || 'Not selected'}`,
-        `- Regional lymph nodes: ${values.regionalNodes || 'Not selected'}`,
-        `- Distant metastasis: ${values.distantMetastasis || 'Not selected'}`,
+        `- Tumor extent: ${values.tumorExtent || 'Not selected'}`,
+        `- Tumor size: ${values.tumorSize || 'Not selected'}`,
+        `- Stromal invasion: ${values.stromalInvasion || 'Not selected'}`,
+        `- Regional nodes: ${values.regionalNodes || 'Not selected'}`,
+        `- Pelvic nodes/distant disease: ${values.distantDisease || 'Not selected'}`,
         '',
-        'Generated by FIGO Vaginal Cancer Staging Calculator v1.3.0.'
+        'Generated by FIGO 2021 Vulvar Cancer Staging Calculator v1.3.0.'
       ];
       try {
         await navigator.clipboard.writeText(lines.join('\n'));

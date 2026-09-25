@@ -50,7 +50,8 @@ const cervicalBase = {
   distantOrgans: 'no'
 };
 assert.equal(cervical.calculate(cervicalBase).stage, 'IA1');
-assert.equal(cervical.calculate({ ...cervicalBase, distantOrgans: '' }).stage, '');
+assert.equal(cervical.calculate({ ...cervicalBase, distantOrgans: '' }).stage, 'IA1');
+assert.equal(cervical.calculate({ ...cervicalBase, distantOrgans: '' }).provisional, true);
 assert.equal(cervical.calculate({ ...cervicalBase, lymphNode: 'metastasis to pelvic node(s) indicated by image study' }).stage, 'IIIC1r');
 assert.equal(cervical.calculate({ ...cervicalBase, lymphNode: 'isolated tumor cells only' }).stage, 'IA1');
 assert.equal(cervical.calculate({ ...cervicalBase, adjacentOrgans: 'extension beyond the true pelvis' }).stage, 'IVA');
@@ -69,7 +70,8 @@ const ovarianBase = {
 };
 assert.equal(ovarian.calculate(ovarianBase).stage, 'IA');
 assert.equal(ovarian.calculate({ ...ovarianBase, washings: 'yes' }).stage, 'IC3');
-assert.equal(ovarian.calculate({ ...ovarianBase, washings: '' }).stage, '');
+assert.equal(ovarian.calculate({ ...ovarianBase, washings: '' }).stage, 'I');
+assert.equal(ovarian.calculate({ ...ovarianBase, washings: '' }).provisional, true);
 assert.equal(ovarian.calculate({ ...ovarianBase, confinedTumor: 'none', retroNodes: 'positive-le-10mm' }).stage, 'IIIA1(i)');
 assert.ok(!ovarian.html.includes('positive-with-peritoneal'));
 
@@ -81,7 +83,9 @@ const vaginalBase = {
   distantMetastasis: 'no'
 };
 assert.equal(vaginal.calculate(vaginalBase).stage, 'I');
-assert.equal(vaginal.calculate({ ...vaginalBase, distantMetastasis: '' }).stage, '');
+assert.equal(vaginal.calculate({ ...vaginalBase, distantMetastasis: '' }).stage, 'I');
+assert.equal(vaginal.calculate({ ...vaginalBase, distantMetastasis: '' }).provisional, true);
+assert.equal(vaginal.calculate({ ...vaginalBase, regionalNodes: 'not-assessed' }).provisional, true);
 assert.equal(vaginal.calculate({ ...vaginalBase, primaryTumor: 'bladder-rectum-true-pelvis', bullousEdema: 'yes' }).stage, '');
 assert.equal(vaginal.calculate({ ...vaginalBase, regionalNodes: 'positive' }).stage, 'III');
 assert.equal(vaginal.calculate({ ...vaginalBase, primaryTumor: 'none', regionalNodes: 'positive' }).stage, '');
@@ -96,7 +100,8 @@ const sarcomaBase = {
   distantMetastases: 'no'
 };
 assert.equal(sarcoma.calculate(sarcomaBase).stage, 'IA');
-assert.equal(sarcoma.calculate({ ...sarcomaBase, distantMetastases: '' }).stage, '');
+assert.equal(sarcoma.calculate({ ...sarcomaBase, distantMetastases: '' }).stage, 'IA');
+assert.equal(sarcoma.calculate({ ...sarcomaBase, distantMetastases: '' }).provisional, true);
 assert.equal(sarcoma.calculate({ ...sarcomaBase, nodes: 'yes' }).stage, 'IIIC');
 
 const gtn = loadCalculator('gtn.html');
@@ -129,8 +134,30 @@ assert.equal(gtn.calculate({ ...gtnBase, diseaseExtent: 'nodes-below-r' }).stage
 assert.equal(gtn.calculate({ ...gtnBase, metastasisSite: 'brain-liver', metastasisNumber: 'one-four' }).stage, 'Stage I (input review)');
 assert.ok(!gtn.html.includes('Previous failed chemotherapy'));
 
-for (const calculator of [cervical, ovarian, vaginal, sarcoma, gtn]) {
-  assert.match(calculator.html, /<strong>Version:<\/strong> 1\.2\.0/);
+const vulvar = loadCalculator('vulvar.html');
+const vulvarBase = {
+  tumorExtent: 'confined',
+  tumorSize: 'le2',
+  stromalInvasion: 'le1',
+  regionalNodes: 'no',
+  distantDisease: 'none'
+};
+assert.equal(vulvar.calculate(vulvarBase).stage, 'IA');
+assert.equal(vulvar.calculate({ ...vulvarBase, tumorSize: 'gt2' }).stage, 'IB');
+assert.equal(vulvar.calculate({ ...vulvarBase, tumorExtent: 'lower-adjacent' }).stage, 'II');
+assert.equal(vulvar.calculate({ ...vulvarBase, tumorExtent: 'upper-adjacent' }).stage, 'IIIA');
+assert.equal(vulvar.calculate({ ...vulvarBase, regionalNodes: 'le5' }).stage, 'IIIA');
+assert.equal(vulvar.calculate({ ...vulvarBase, regionalNodes: 'gt5' }).stage, 'IIIB');
+assert.equal(vulvar.calculate({ ...vulvarBase, regionalNodes: 'extracapsular' }).stage, 'IIIC');
+assert.equal(vulvar.calculate({ ...vulvarBase, regionalNodes: 'fixed-ulcerated' }).stage, 'IVA');
+assert.equal(vulvar.calculate({ ...vulvarBase, distantDisease: 'pelvic-nodes' }).stage, 'IVB');
+const provisionalVulvar = vulvar.calculate({ ...vulvarBase, regionalNodes: '', distantDisease: '' });
+assert.equal(provisionalVulvar.stage, 'IA');
+assert.equal(provisionalVulvar.provisional, true);
+assert.equal(vulvar.calculate({ ...vulvarBase, regionalNodes: 'not-assessed' }).provisional, true);
+
+for (const calculator of [cervical, ovarian, vaginal, sarcoma, gtn, vulvar]) {
+  assert.match(calculator.html, /<strong>Version:<\/strong> 1\.3\.0/);
 }
 
 const endometrialHtml = fs.readFileSync(path.join(__dirname, '..', 'calculators', 'endometrial.html'), 'utf8');

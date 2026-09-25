@@ -34,6 +34,19 @@ function expectStage(stage, changes, expectedDisplay) {
 assert.equal(calculate({}).status, 'incomplete');
 assert.equal(calculate({}).missing.length, 15);
 
+const provisionalEarly = calculate({
+  histology: 'low-grade-eec',
+  myometrialInvasion: 'lt50',
+  lvsi: 'focal',
+  cervicalStroma: 'none'
+});
+assert.equal(provisionalEarly.status, 'provisional');
+assert.equal(provisionalEarly.anatomicStage, 'IA2');
+
+const provisionalAdvanced = calculate({ distantMetastasis: 'present' });
+assert.equal(provisionalAdvanced.status, 'provisional');
+assert.equal(provisionalAdvanced.anatomicStage, 'IVC');
+
 expectStage('IA1', {});
 expectStage('IA2', { myometrialInvasion: 'lt50', lvsi: 'focal' });
 expectStage('IB', { myometrialInvasion: 'ge50', lvsi: 'focal' });
