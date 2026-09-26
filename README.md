@@ -4,18 +4,11 @@ Online-only static website with calculators for:
 
 Current release: **v1.4.1** (neutral opening state for cervical, vulvar, and GTN calculators, 26 September 2026).
 
-Two layouts are available:
-
-- **Computer version 1.4.1:** the main site at `/`.
-- **Phone version 1.1:** a compact layout based on computer version 1.4.1 at `/phone/`.
-
 See [VALIDATION-REPORT-v1.4.1.md](VALIDATION-REPORT-v1.4.1.md) for the current source audit and verification status.
 
 ## Open the calculator
 
 [Open the FIGO staging calculators](https://tinchangchang.github.io/figo-staging-calculators/)
-
-[Open the phone version](https://tinchangchang.github.io/figo-staging-calculators/phone/)
 
 Scan with a smartphone camera:
 
