@@ -1,0 +1,130 @@
+:root {
+  --radius: 8px;
+}
+
+.wrap {
+  width: min(720px, 100%);
+  padding: 12px 10px 24px;
+}
+
+header {
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+header h1 {
+  font-size: 1.65rem;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.subhead {
+  font-size: .86rem;
+  line-height: 1.35;
+}
+
+.home-link {
+  margin-bottom: 4px;
+  font-size: .92rem;
+}
+
+.grid {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.card {
+  border-radius: 8px;
+}
+
+form {
+  padding: 2px 12px 12px;
+}
+
+fieldset {
+  margin: 0;
+  padding: 5px 0;
+}
+
+.section-title {
+  margin: 3px 0 2px;
+  font-size: .72rem;
+}
+
+.field {
+  grid-template-columns: minmax(108px, 40%) minmax(0, 60%);
+  gap: 8px;
+  padding: 5px 0;
+}
+
+label {
+  padding-top: 6px;
+  font-size: .84rem;
+  line-height: 1.22;
+}
+
+.hint {
+  margin-top: 2px;
+  font-size: .7rem;
+  line-height: 1.2;
+}
+
+select {
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 30px 7px 8px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.actions {
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.actions button {
+  flex: 1 1 auto;
+  padding: 8px 10px;
+}
+
+.result-card {
+  position: static;
+}
+
+.result-main {
+  padding: 14px 12px;
+}
+
+.support {
+  padding: 12px;
+}
+
+.reason {
+  margin-top: 8px;
+  font-size: .9rem;
+}
+
+.badge-row {
+  margin-top: 9px;
+}
+
+.notice {
+  margin-top: 10px;
+  padding: 10px 12px;
+}
+
+footer {
+  margin-top: 10px;
+}
+
+@media (max-width: 360px) {
+  .field {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  label {
+    padding-top: 0;
+  }
+}

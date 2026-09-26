@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#8b1e3f" />
   <meta name="description" content="Combined FIGO gynecologic cancer staging calculator app." />
   <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
-  <title>FIGO Gynecologic Cancer Staging Calculators</title>
+  <title>FIGO Gynecologic Cancer Staging Calculators - Phone Version</title>
   <style>
     :root {
       --figo: #8b1e3f;
@@ -59,12 +59,6 @@
       font-size: clamp(1.75rem, 5vw, 3.2rem);
       line-height: 1.05;
       letter-spacing: -0.035em;
-    }
-
-    .edition-switch {
-      color: var(--figo);
-      font-size: .92rem;
-      font-weight: 800;
     }
 
     .calculator-grid {
@@ -161,13 +155,14 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="./home.css" />
 </head>
 <body>
   <div class="wrap">
     <header>
-      <p class="eyebrow">FIGO Women's Cancer Committee</p>
+      <p class="eyebrow">Phone version</p>
       <h1>FIGO Gynecologic Cancer Staging Calculators</h1>
-      <a class="edition-switch" href="./phone/index.html">Open phone version</a>
+      <a class="edition-switch" href="../index.html">Open computer version</a>
     </header>
 
     <main class="calculator-grid" aria-label="Calculator menu">
@@ -233,7 +228,7 @@
     </div>
 
     <footer>
-      <p><strong>Version:</strong> Computer version 1.4.1 · Confidence-shaded live staging across seven modules.</p>
+      <p><strong>Edition:</strong> Phone version · Based on computer version 1.4.1.</p>
     </footer>
   </div>
 
