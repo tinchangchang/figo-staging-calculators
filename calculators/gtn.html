@@ -199,7 +199,7 @@
 
     .stage {
       margin: 0;
-      color: var(--figo);
+      color: var(--stage-confidence-color, var(--figo));
       font-size: clamp(2rem, 8vw, 3.6rem);
       font-weight: 900;
       letter-spacing: -0.05em;
@@ -210,6 +210,15 @@
       color: var(--muted);
       font-size: clamp(1.55rem, 7vw, 2.3rem);
       letter-spacing: -0.025em;
+    }
+
+    .stage .prognostic-qualifier {
+      display: block;
+      margin-top: 7px;
+      font-size: .38em;
+      font-weight: 800;
+      letter-spacing: 0;
+      line-height: 1.15;
     }
 
     .reason {
@@ -267,7 +276,7 @@
       color: var(--figo);
       text-decoration: none;
       font-weight: 800;
-      font-size: .9rem;
+      font-size: 1.08rem;
     }
 
     .home-link:hover { color: var(--figo-dark); }
@@ -313,15 +322,13 @@
       <a class="home-link" href="../index.html">← Calculator menu</a>
       <p class="eyebrow">FIGO Women's Cancer Committee</p>
       <h1>FIGO 2026 Gestational Trophoblastic Neoplasia Staging Calculator</h1>
-      <p class="subhead">Select the disease type, anatomic extent, and applicable prognostic factors. Standard GTN uses stage plus score; PSTT/ETT uses stage plus GP/PP.</p>
+      <p class="subhead">Select the disease type, anatomic extent, and applicable prognostic factors. Standard GTN uses stage plus score; PSTT/ETT uses stage plus a good or poor prognostic factor.</p>
     </header>
 
     <main class="grid">
-      <section class="card" aria-labelledby="input-heading">
-        <h2 id="input-heading">Staging inputs</h2>
-        <form id="stageForm">
+      <section class="card" aria-label="GTN calculator inputs">
+        <form id="stageForm" data-calculator="gtn">
           <fieldset>
-            <p class="section-title">FIGO anatomic stage</p>
             <div class="field">
               <label for="diseaseType">Disease type</label>
               <select id="diseaseType" name="diseaseType">
@@ -347,13 +354,16 @@
               </select>
             </div>
             <div class="field">
-              <label for="psttInterval">PSTT/ETT interval from previous pregnancy
-                <span class="hint">Used only for PSTT/ETT; stages I-III are designated GP or PP.</span>
+              <label for="interval">Interval from index/previous pregnancy
+                <span class="hint">Also defines the good or poor prognostic factor for PSTT/ETT stages I-III.</span>
               </label>
-              <select id="psttInterval" name="psttInterval">
-                <option value="" disabled selected hidden>Select if applicable...</option>
-                <option value="lt48">&lt;48 months (good prognostic factor, GP)</option>
-                <option value="ge48">&ge;48 months (poor prognostic factor, PP)</option>
+              <select id="interval" name="interval">
+                <option value="" disabled selected hidden>Select...</option>
+                <option value="0">&lt;4 months</option>
+                <option value="1">4-6 months</option>
+                <option value="2">7-12 months</option>
+                <option value="4">13-47 months</option>
+                <option value="ge48">&ge;48 months</option>
               </select>
             </div>
           </fieldset>
@@ -375,16 +385,6 @@
                 <option value="0">Mole</option>
                 <option value="1">Abortion</option>
                 <option value="2">Term pregnancy</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="interval">Interval from index pregnancy</label>
-              <select id="interval" name="interval">
-                <option value="" disabled selected hidden>Select...</option>
-                <option value="0">&lt;4 months</option>
-                <option value="1">4-6 months</option>
-                <option value="2">7-12 months</option>
-                <option value="4">&gt;12 months</option>
               </select>
             </div>
             <div class="field">
@@ -455,7 +455,7 @@
         <div class="support">
           <h3>Calculation rationale</h3>
           <ul id="rationaleList">
-            <li>FIGO 2026 combines anatomic stage with the seven-factor score for standard GTN; PSTT/ETT instead uses GP/PP.</li>
+            <li>FIGO 2026 combines anatomic stage with the seven-factor score for standard GTN; PSTT/ETT instead uses the interval from the previous pregnancy for stages I-III.</li>
           </ul>
           <div class="notice">
             This calculator is a staging aid only. Confirm final GTN stage and score with complete clinical, imaging, histological, hCG, treatment, and multidisciplinary information before clinical use.
@@ -465,7 +465,7 @@
     </main>
 
     <footer>
-      <p><strong>Version:</strong> 1.3.0 · Online calculator suite.</p>
+      <p><strong>Version:</strong> 1.4.1 · Online calculator suite.</p>
       <p><strong>Reference:</strong> Ngan HYS, Seckl MJ, Horowitz N, et al. FIGO staging for gestational trophoblastic neoplasia: 2026. Int J Gynecol Obstet. 2026;174(3):1172-1180. DOI 10.1002/ijgo.71229.</p>
     </footer>
   </div>
@@ -474,7 +474,7 @@
 
   <script>
     const form = document.getElementById('stageForm');
-    const fields = ['diseaseType', 'diseaseExtent', 'psttInterval', 'age', 'antecedentPregnancy', 'interval', 'hcg', 'tumorSize', 'metastasisSite', 'metastasisNumber'];
+    const fields = ['diseaseType', 'diseaseExtent', 'interval', 'age', 'antecedentPregnancy', 'hcg', 'tumorSize', 'metastasisSite', 'metastasisNumber'];
     const stageValue = document.getElementById('stageValue');
     const reasonText = document.getElementById('reasonText');
     const rationaleList = document.getElementById('rationaleList');
@@ -482,7 +482,13 @@
     const toast = document.getElementById('toast');
 
     function getInputs() {
-      return Object.fromEntries(fields.map(id => [id, document.getElementById(id).value]));
+      return Object.fromEntries(fields.map(id => {
+        const select = document.getElementById(id);
+        if (id === 'interval' && document.getElementById('diseaseType').value === 'pstt-ett') {
+          return [id, select.value];
+        }
+        return [id, select.value || select.options?.[1]?.value || ''];
+      }));
     }
 
     function stageResult(stage, score, risk, reason, rationale, badges = []) {
@@ -493,11 +499,11 @@
       if (extent === 'uterus') return { stage: 'I', reason: 'Disease is strictly confined to the uterine corpus and cervix.' };
       if (extent === 'genital') return { stage: 'II', reason: 'Disease extends to adnexa, vagina, or broad ligaments but is limited to genital structures.' };
       if (extent === 'lung') return { stage: 'III', reason: 'Disease extends to the lungs, with or without genital tract involvement.' };
-      if (extent === 'nodes-below-r') return { stage: 'III LN r', reason: 'Lymph-node metastasis below the diaphragm is identified by imaging.' };
-      if (extent === 'nodes-below-p') return { stage: 'III LN p', reason: 'Lymph-node metastasis below the diaphragm is confirmed pathologically.' };
+      if (extent === 'nodes-below-r') return { stage: 'III LNr', reason: 'Lymph-node metastasis below the diaphragm is identified by imaging.' };
+      if (extent === 'nodes-below-p') return { stage: 'III LNp', reason: 'Lymph-node metastasis below the diaphragm is confirmed pathologically.' };
       if (extent === 'other-metastatic') return { stage: 'IV', reason: 'Metastatic disease involves other sites beyond lung/genital structures.' };
-      if (extent === 'nodes-above-r') return { stage: 'IV LN r', reason: 'Lymph-node metastasis above the diaphragm is identified by imaging.' };
-      if (extent === 'nodes-above-p') return { stage: 'IV LN p', reason: 'Lymph-node metastasis above the diaphragm is confirmed pathologically.' };
+      if (extent === 'nodes-above-r') return { stage: 'IV LNr', reason: 'Lymph-node metastasis above the diaphragm is identified by imaging.' };
+      if (extent === 'nodes-above-p') return { stage: 'IV LNp', reason: 'Lymph-node metastasis above the diaphragm is confirmed pathologically.' };
       return { stage: '', reason: 'Anatomic disease extent is not selected.' };
     }
 
@@ -506,8 +512,10 @@
       const missing = scoreFields.filter(id => v[id] === '');
       const siteScores = { none: 0, 'lung-vagina': 0, 'spleen-kidney': 1, gi: 2, 'brain-liver': 4 };
       const numberScores = { none: 0, 'one-four': 1, 'five-eight': 2, 'more-eight': 4 };
-      const total = ['age', 'antecedentPregnancy', 'interval', 'hcg', 'tumorSize']
+      const intervalScore = v.interval === 'ge48' ? 4 : Number(v.interval || 0);
+      const total = ['age', 'antecedentPregnancy', 'hcg', 'tumorSize']
         .reduce((sum, id) => sum + (v[id] === '' ? 0 : Number(v[id])), 0)
+        + intervalScore
         + (siteScores[v.metastasisSite] || 0)
         + (numberScores[v.metastasisNumber] || 0);
       return { total, missing, unlistedSite: v.metastasisSite === 'other' };
@@ -529,18 +537,19 @@
       }
 
       if (v.diseaseType === 'pstt-ett') {
-        if (!anatomy.stage.startsWith('IV') && !v.psttInterval) {
-          return stageResult(`Stage ${anatomy.stage} (GP/PP incomplete)`, null, '',
-            'Select the interval from the previous pregnancy to designate the PSTT/ETT prognostic group.',
+        if (!anatomy.stage.startsWith('IV') && !v.interval) {
+          return stageResult(`Stage ${anatomy.stage} (prognostic factor incomplete)`, null, '',
+            'Select the interval from the index/previous pregnancy to designate the PSTT/ETT prognostic factor.',
             [anatomy.reason, 'PSTT/ETT does not use the modified WHO numerical score.'],
             [`Stage ${anatomy.stage}`, 'PSTT/ETT']);
         }
-        const prognostic = anatomy.stage.startsWith('IV') || v.psttInterval === 'ge48' ? 'PP' : 'GP';
-        const output = `Stage ${anatomy.stage}:${prognostic}`;
-        return stageResult(output, null, prognostic,
+        const poorPrognosis = anatomy.stage.startsWith('IV') || v.interval === 'ge48';
+        const qualifier = poorPrognosis ? 'with poor prognostic factor' : 'with good prognostic factor';
+        const output = `Stage ${anatomy.stage} ${qualifier}`;
+        return stageResult(output, null, poorPrognosis ? 'Poor prognostic factor' : 'Good prognostic factor',
           `${output} · PSTT/ETT 2026 classification`,
-          [anatomy.reason, prognostic === 'GP' ? 'Interval from previous pregnancy is <48 months.' : 'Poor prognosis designation applies (interval ≥48 months, or Stage IV).'],
-          [`Stage ${anatomy.stage}`, prognostic, 'PSTT/ETT']);
+          [anatomy.reason, poorPrognosis ? 'Poor prognosis applies when the interval is ≥48 months, or for Stage IV.' : 'Interval from the index/previous pregnancy is <48 months.'],
+          [`Stage ${anatomy.stage}`, poorPrognosis ? 'Poor prognostic factor' : 'Good prognostic factor', 'PSTT/ETT']);
       }
 
       const score = scoreInputs(v);
@@ -554,7 +563,7 @@
       if (score.unlistedSite) {
         return stageResult(`Stage ${anatomy.stage} (score review)`, null, 'High-risk GTN',
           'An unlisted metastatic organ is considered high risk, but the FIGO table does not provide a numerical site score.',
-          [anatomy.reason, 'Assign the exact combined stage:score in specialist review.'],
+            [anatomy.reason, 'Assign the exact combined stage and score in specialist review.'],
           [`Stage ${anatomy.stage}`, 'Expert review']);
       }
 
@@ -567,12 +576,12 @@
       if (inconsistentMetastasisInputs) {
         return stageResult(`Stage ${anatomy.stage} (input review)`, null, '',
           'The selected anatomic extent, metastatic site, and metastasis count are internally inconsistent.',
-          [anatomy.reason, 'Correct the conflicting fields before assigning a combined stage:score.'],
+          [anatomy.reason, 'Correct the conflicting fields before assigning a combined stage and score.'],
           [`Stage ${anatomy.stage}`, 'Input review']);
       }
 
       const risk = riskGroup(score.total);
-      const output = `Stage ${anatomy.stage}:${score.total}`;
+      const output = `Stage ${anatomy.stage}, Score ${score.total}`;
       const rationale = [anatomy.reason, `FIGO-modified WHO prognostic score total: ${score.total}.`, `Risk group: ${risk} (0-6 low, 7-12 high, ≥13 ultra-high).`];
       if (score.total === 5 || score.total === 6) rationale.push('Scores 5-6 remain low risk but are associated with higher rates of chemoresistance; assess the additional FIGO 2026 caution factors.');
 
@@ -584,7 +593,10 @@
 
     function renderResult(result) {
       if (result.stage) {
-        stageValue.textContent = result.stage;
+        const qualifierMatch = result.stage.match(/^(Stage .+?) (with (?:good|poor) prognostic factor)$/);
+        stageValue.innerHTML = qualifierMatch
+          ? `${escapeHtml(qualifierMatch[1])} <span class="prognostic-qualifier">${escapeHtml(qualifierMatch[2])}</span>`
+          : escapeHtml(result.stage);
         stageValue.classList.remove('empty');
       } else {
         stageValue.textContent = 'Not determined';
@@ -600,7 +612,17 @@
     }
 
     function update() {
-      const result = calculateStage(getInputs());
+      const hasExplicitInput = fields.some(id => document.getElementById(id).value !== '');
+      const result = hasExplicitInput
+        ? calculateStage(getInputs())
+        : stageResult(
+            '',
+            null,
+            '',
+            'Select at least one field to begin staging.',
+            ['Unanswered fields will use their first clinical option as the calculation default after staging begins.'],
+            ['Needs input']
+          );
       renderResult(result);
       return result;
     }
@@ -619,22 +641,21 @@
       const result = update();
       const lines = [
         `FIGO GTN stage and score: ${result.stage || 'Not determined'}`,
-        `Risk group: ${result.risk || 'Not determined'}`,
+        `Risk group / prognostic factor: ${result.risk || 'Not determined'}`,
         `Reason: ${result.reason}`,
         '',
         'Inputs:',
         `- Disease type: ${values.diseaseType || 'Not selected'}`,
         `- Disease extent: ${values.diseaseExtent || 'Not selected'}`,
-        `- PSTT/ETT pregnancy interval: ${values.psttInterval || 'Not selected / not applicable'}`,
         `- Age: ${values.age || 'Not selected'}`,
         `- Antecedent pregnancy: ${values.antecedentPregnancy || 'Not selected'}`,
-        `- Interval from index pregnancy: ${values.interval || 'Not selected'}`,
+        `- Interval from index/previous pregnancy: ${values.interval || 'Not selected'}`,
         `- Pre-treatment hCG: ${values.hcg || 'Not selected'}`,
         `- Largest tumor size: ${values.tumorSize || 'Not selected'}`,
         `- Site of metastases: ${values.metastasisSite || 'Not selected'}`,
         `- Number of metastases: ${values.metastasisNumber || 'Not selected'}`,
         '',
-        'Generated by FIGO Gestational Trophoblastic Neoplasia Staging Calculator v1.3.0.'
+        'Generated by FIGO Gestational Trophoblastic Neoplasia Staging Calculator v1.4.1.'
       ];
       try {
         await navigator.clipboard.writeText(lines.join('\n'));
@@ -646,5 +667,6 @@
 
     update();
   </script>
+  <script src="./calculator-ui.js"></script>
 </body>
 </html>

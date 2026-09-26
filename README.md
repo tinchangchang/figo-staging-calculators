@@ -2,9 +2,9 @@
 
 Online-only static website with calculators for:
 
-Current release: **v1.3.0** (vulvar calculator and provisional live-stage display added 25 September 2026).
+Current release: **v1.4.1** (neutral opening state for cervical, vulvar, and GTN calculators, 26 September 2026).
 
-See [VALIDATION-REPORT-v1.3.0.md](VALIDATION-REPORT-v1.3.0.md) for the current source audit and verification status.
+See [VALIDATION-REPORT-v1.4.1.md](VALIDATION-REPORT-v1.4.1.md) for the current source audit and verification status.
 
 ## Open the calculator
 
@@ -16,13 +16,13 @@ Scan with a smartphone camera:
 
 ## Included calculators
 
-- Epithelial ovarian, fallopian tube, and peritoneal cancer
 - Cervical cancer
-- Vulvar cancer (FIGO 2021 staging)
-- Vaginal cancer
 - Endometrial cancer (FIGO 2023 anatomical and molecular staging)
-- Uterine leiomyosarcoma
+- Epithelial ovarian, fallopian tube, and peritoneal cancer
 - Gestational trophoblastic neoplasia (FIGO 2026, including PSTT/ETT GP/PP classification)
+- Uterine leiomyosarcoma
+- Vaginal cancer
+- Vulvar cancer (FIGO 2021 staging)
 
 Open `index.html` to choose a calculator. GitHub Pages deploys the site automatically after changes are merged into `main`.
 
