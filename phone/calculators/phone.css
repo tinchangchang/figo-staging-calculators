@@ -13,8 +13,8 @@ header {
 }
 
 header h1 {
-  font-size: 1.65rem;
-  line-height: 1.08;
+  font-size: 1.38rem;
+  line-height: 1.14;
   letter-spacing: 0;
 }
 
@@ -38,12 +38,12 @@ header h1 {
 }
 
 form {
-  padding: 2px 12px 12px;
+  padding: 1px 10px 10px;
 }
 
 fieldset {
   margin: 0;
-  padding: 5px 0;
+  padding: 3px 0;
 }
 
 .section-title {
@@ -52,9 +52,9 @@ fieldset {
 }
 
 .field {
-  grid-template-columns: minmax(108px, 40%) minmax(0, 60%);
-  gap: 8px;
-  padding: 5px 0;
+  grid-template-columns: minmax(104px, 39%) minmax(0, 61%);
+  gap: 4px;
+  padding: 3px 0;
 }
 
 label {
@@ -71,8 +71,8 @@ label {
 
 select {
   min-width: 0;
-  min-height: 36px;
-  padding: 7px 30px 7px 8px;
+  min-height: 34px;
+  padding: 5px 28px 5px 7px;
   border-radius: 6px;
   font-size: 16px;
   line-height: 1.2;

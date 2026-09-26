@@ -7,7 +7,7 @@ Current release: **v1.4.1** (neutral opening state for cervical, vulvar, and GTN
 Two layouts are available:
 
 - **Computer version 1.4.1:** the main site at `/`.
-- **Phone version:** a compact layout based on computer version 1.4.1 at `/phone/`.
+- **Phone version 1.1:** a compact layout based on computer version 1.4.1 at `/phone/`.
 
 See [VALIDATION-REPORT-v1.4.1.md](VALIDATION-REPORT-v1.4.1.md) for the current source audit and verification status.
 

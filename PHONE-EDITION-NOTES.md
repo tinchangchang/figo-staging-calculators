@@ -1,6 +1,6 @@
-# Phone edition
+# Phone version 1.1
 
-The phone edition is based on the validated computer version 1.4.1 and is published under `/phone/`.
+Phone version 1.1 is based on the validated computer version 1.4.1 and is published under `/phone/`.
 
 ## Presentation changes
 
@@ -9,6 +9,7 @@ The phone edition is based on the validated computer version 1.4.1 and is publis
 - Reduces field padding, control height, section spacing, and result-panel spacing.
 - Uses a single-column calculator layout and compact menu cards.
 - Retains a stacked field layout below 360 px for accessibility on very narrow screens.
+- Uses shorter module titles and tighter field gaps for a more compact phone view.
 
 ## Clinical logic
 

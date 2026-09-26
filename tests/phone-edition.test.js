@@ -14,6 +14,15 @@ const calculators = [
   'vaginal.html',
   'vulvar.html'
 ];
+const expectedTitles = {
+  'cervical.html': 'Cervical Cancer',
+  'endometrial.html': 'Endometrial Cancer',
+  'gtn.html': 'Gestational Trophoblastic Neoplasia',
+  'ovarian-fallopian-peritoneal.html': 'Epithelial Ovarian, Fallopian Tube, and Peritoneal Cancer',
+  'uterine-leiomyosarcoma.html': 'Uterine Leiomyosarcoma',
+  'vaginal.html': 'Vaginal Cancer',
+  'vulvar.html': 'Vulvar Cancer'
+};
 
 function inlineScripts(html) {
   return [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)]
@@ -27,7 +36,8 @@ for (const filename of calculators) {
 
   assert.ok(!phone.includes('>Staging inputs<'), `${filename} still shows the removed heading`);
   assert.ok(phone.includes('href="./phone.css"'), `${filename} does not load phone.css`);
-  assert.ok(phone.includes('Phone version'), `${filename} is not marked as the phone edition`);
+  assert.ok(phone.includes('Phone version 1.1'), `${filename} is not marked as phone version 1.1`);
+  assert.ok(phone.includes(`<h1>${expectedTitles[filename]}</h1>`), `${filename} does not use its compact title`);
   assert.deepEqual(inlineScripts(phone), inlineScripts(computer), `${filename} staging logic differs between editions`);
 }
 
